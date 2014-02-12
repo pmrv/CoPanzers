@@ -1,0 +1,9 @@
+*.swp
+*.bak
+*.pyc
+*pycache*
+*egg-info/*
+MANIFEST
+dist/*
+build/*
+todo

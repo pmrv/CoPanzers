@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+
+import pygame, math
+from pygame.locals import *
+
+from pytanks import Barrier, Bullet
+from pytanks.util import Destroyed
+
+def main (fps, w, h):
+
+    surface = pygame.display.set_mode ( (w, h) )
+    clock   = pygame.time.Clock ()
+    things  = []
+    frames  = 0
+
+    things.append (Barrier ( 10, (155, 50, 0), (w / 2, 50), (w / 4, 20) ))
+
+    while 1:
+
+        for e in pygame.event.get ():
+            if e.type == QUIT: return
+
+        surface.fill ( (255, 255, 255) )
+
+        frames += 1
+        if frames == 1:
+
+            for i in range (6):
+                things.append (Bullet (-50, math.pi / 2, 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5)))
+
+        if frames == 200:
+
+            for i in range (6):
+                things.append (
+                    Bullet (-50, math.pi / 3 + math.pi / 15 * i, 2, (255, 255, 0), (w / 2, h - 10), (5, 5))
+                )
+
+        if frames > 500 and frames % 20 == 0:
+
+            things.append (
+                Bullet (-60, math.pi / 2, 2, (255, 255, 0), (w / 2, h), (5, 5))
+            )
+
+        for t in things:
+            try:
+                t.step (things, 1 / fps)
+            except Destroyed:
+                things.remove (t)
+            finally:
+                t.draw (surface)
+
+        pygame.display.update ()
+        clock.tick (fps)
+
+if __name__ == "__main__":
+    main (60, 640, 340)
