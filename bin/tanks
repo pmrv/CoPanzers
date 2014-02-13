@@ -3,8 +3,10 @@
 import pygame, math
 from pygame.locals import *
 
-from pytanks import Barrier, Bullet
-from pytanks.util import Destroyed
+from pytanks.barrier import Barrier
+from pytanks.bullet  import Bullet
+from pytanks.turret  import Turret
+from pytanks.util    import Destroyed
 
 def main (fps, w, h):
 
@@ -13,7 +15,17 @@ def main (fps, w, h):
     things  = []
     frames  = 0
 
-    things.append (Barrier ( 10, (155, 50, 0), (w / 2, 50), (w / 4, 20) ))
+    things.append (Barrier ( 10, (155, 50, 0), (w / 2, 100), (w / 4, 20) ))
+    things.append (Barrier ( 10, (155, 50, 0), (50, 50), (20, 20) ))
+    things.append (Barrier ( 10, (155, 50, 0), (50 + 1*(w - 100)/2, 50), (20, 20) ))
+    things.append (Barrier ( 10, (155, 50, 0), (50 + 2*(w - 100)/2, 50), (20, 20) ))
+
+    s = pygame.Surface ((30, 30))
+    s.set_colorkey ( (0, 0, 0) )
+    pygame.draw.polygon (s, (0, 155, 0), ((0, 15), (15, 0), (30, 15), (15, 30)))
+    pygame.draw.polygon (s, (0, 0, 0), ((0, 15), (15, 0), (30, 15), (15, 30)), 1)
+    things.append (Turret (s, (w * .9, h * .9), (30, 30)))
+    things.append (Turret (s, (w * .1, h * .9), (30, 30)))
 
     while 1:
 
@@ -26,16 +38,18 @@ def main (fps, w, h):
         if frames == 1:
 
             for i in range (6):
-                things.append (Bullet (-50, math.pi / 2, 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5)))
+                things.append (
+                    Bullet (50, -math.pi / 2, 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5))
+                )
 
         if frames == 200:
 
             for i in range (6):
                 things.append (
-                    Bullet (-50, math.pi / 3 + math.pi / 15 * i, 2, (255, 255, 0), (w / 2, h - 10), (5, 5))
+                    Bullet (50, -math.pi / 3 - math.pi / 15 * i, 2, (255, 255, 0), (w / 2, h - 10), (5, 5))
                 )
 
-        if frames > 500 and frames % 20 == 0:
+        if 1000 > frames > 500 and frames % 50 == 0:
 
             things.append (
                 Bullet (-60, math.pi / 2, 2, (255, 255, 0), (w / 2, h), (5, 5))
@@ -53,4 +67,4 @@ def main (fps, w, h):
         clock.tick (fps)
 
 if __name__ == "__main__":
-    main (60, 640, 340)
+    main (30, 640, 340)

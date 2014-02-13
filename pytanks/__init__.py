@@ -1,7 +1,6 @@
 import pygame, math
 
-from .util import Destroyed, Rect
-import pytanks.target as target
+from .util import Rect
 
 class GameObject:
 
@@ -23,8 +22,8 @@ class GameObject:
             pygame.draw.rect (self.texture, (0, 0, 0), self.texture.get_rect (), 1)
         else:
             raise TypeError ("Parameter $texture must be a pygame Surface or Color.")
-        
-        self.position  = list (position)
+
+        self.position = list (position)
 
     def step (self, other_game_objects, relative_time):
         """
@@ -39,47 +38,4 @@ class GameObject:
     def draw (self, surface):
         surface.blit (self.texture, (self.position [0] - self.texture.get_width () / 2,
                                     self.position [1] - self.texture.get_height () / 2))
-
-
-class Barrier (GameObject):
-
-    def __init__ (self, hp, *args, **kw):
-        GameObject.__init__ (self, *args, **kw)
-        target.init (self, hp)
-
-    hit = target.hit
-
-    def step (self, o, t):
-        target.step (self, o, t)
-        GameObject.step (self, o, t)
-
-    def draw (self, surface):
-        GameObject.draw (self, surface)
-        target.draw (self, surface)
-
-class Bullet (GameObject):
-
-    def __init__ (self, speed, direction, damage, *args, **kw):
-        """
-        speed     -- int, how fast is the bullet moving
-        direction -- float, in radians
-        damage    -- int
-        """
-
-        self.damage    = damage
-        self.dx = math.cos (direction) * speed
-        self.dy = math.sin (direction) * speed
-
-        GameObject.__init__ (self, *args, **kw)
-
-    def step (self, others, dt):
-
-        for o in others:
-            if self.hitbox.colliderect (o.hitbox) and hasattr (o, "hit"):
-                o.hit (self.damage, self)
-                raise Destroyed ("Bullet hit something.")
-        self.position [0] += self.dx * dt
-        self.position [1] += self.dy * dt
-
-        GameObject.step (self, others, dt)
 

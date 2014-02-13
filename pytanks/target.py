@@ -21,7 +21,7 @@ def init (self, hp, center = None, size = None, *args):
         self.health = HealthBar (hp, center, size, *args)
 
 def draw (self, surface):
-    if self.health:
+    if hasattr (self, "health"):
         self.health.draw (surface)
 
 def step (self, a, b):
