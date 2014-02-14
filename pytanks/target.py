@@ -10,12 +10,15 @@ def init (self, hp, center = None, size = None, *args):
     inits a health bar when hp > 0 else 
     takes the object for invincible
     hp -- int
+    center, size -- 2 tuple of int, describing position and
+                    size of the healthbar
     """
 
     if center == None:
-        center = self.hitbox.center
+        center = list (self.hitbox.center)
+        center [1] -= self.hitbox.height * .75
     if size == None:
-        size = (10, 6)
+        size = (.75 * self.hitbox.width, 5)
 
     if hp > 0:
         self.health = HealthBar (hp, center, size, *args)
