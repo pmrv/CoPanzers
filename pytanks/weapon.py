@@ -6,7 +6,7 @@ from pytanks.util   import Rect
 class Weapon:
 
     def __init__ (self, surface, reload_time, damage, 
-                  muzzle_speed, relative_position):
+                  muzzle_speed, relative_position, kind, root):
         """
         surface           -- pygame.Surface, what the weapon looks like
         reload_time       -- float
@@ -14,18 +14,22 @@ class Weapon:
                              relative to object it is attached to
         damage            -- int
         muzzle_speed      -- int, px/sec
+        kind              -- str, the kind with which our bullets are tagged
+        root              -- pytanks.GameObject, the object this weapon is placed on
         """
 
         self.relative_position = relative_position
         self.muzzle_speed = muzzle_speed
-        self.reload_time = reload_time
-        self.surface = surface
+        self.reload_time= reload_time
+        self.surface  = surface
         self.damage = damage
+        self.root = root
+        self.kind = kind 
 
         self.rotation = 0 # direction in which the last bullet was fired
         self.reloaded = 0
 
-    def shoot (self, angle, pos):
+    def shoot (self, angle):
         """
         returns a bullet, caller has to add it to the list of game objects
         angle -- float, direction in which to fire
@@ -35,21 +39,27 @@ class Weapon:
         if self.reloaded > 0: return None
 
         self.reloaded = self.reload_time
-        self.rotation = angle
+        self.rotation = -angle
+        pos  = self.root.position
         rpos = self.relative_position
-        return Bullet (self.muzzle_speed, -angle, self.damage, 
-                       (255, 255, 0), (pos [0] + rpos [0], pos [1] + rpos [1]), (5, 5))
+        b = Bullet (self.muzzle_speed, angle, self.damage, 
+                    (255, 255, 0), (pos [0] + rpos [0], pos [1] + rpos [1]), (5, 5))
+
+        # not really content with that
+        b.tags ["kind"] = self.kind
+        b.tags ["team"] = self.root.tags ["team"]
+        return b
 
     def step (self, dt):
         self.reloaded -= dt
 
-    def draw (self, surface, pos):
+    def draw (self, surface):
+        pos  = self.root.position
         rpos = self.relative_position
         tsurf = pygame.transform.rotate (self.surface, math.degrees (self.rotation - math.pi / 2))
         dest = tsurf.get_rect ()
         dest.center = (pos [0] + rpos [0], pos [1] + rpos [1])
         surface.blit (tsurf, dest) 
-                      
 
 class ExampleWeapon (Weapon):
 
@@ -61,4 +71,4 @@ class ExampleWeapon (Weapon):
         pygame.draw.polygon (s, (0, 0, 150), ((0, h/2), (w, h/2), (w/2, 0)))
 
         # some arbitrarily chosen values
-        Weapon.__init__ (self, s, .1, 1, 80, (0, 0), *args, **kw) 
+        Weapon.__init__ (self, s, .1, 1, 80, (0, 0), "ExampleWeapon", *args, **kw) 
