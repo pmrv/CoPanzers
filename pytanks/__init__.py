@@ -17,6 +17,7 @@ class GameObject:
             self.texture = texture
         elif isinstance (texture, (pygame.Color, tuple)):
             self.texture = pygame.Surface (self.hitbox.size)
+            self.texture.set_colorkey ( (255,) * 3 )
             self.texture.fill (texture)
             pygame.draw.rect (self.texture, (0, 0, 0), self.texture.get_rect (), 1)
         else:

@@ -35,21 +35,16 @@ def main (fps, w, h):
 
             for i in range (6):
                 things.append (
-                    Bullet (50, -math.pi / 2, 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5))
+                    Bullet (1, 2, 50, -math.pi / 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5))
                 )
 
         if frames == 200:
 
             for i in range (6):
                 things.append (
-                    Bullet (50, -math.pi / 3 - math.pi / 15 * i, 2, (255, 255, 0), (w / 2, h - 10), (5, 5))
+                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, (255, 255, 0), (w / 2, h - 10), (5, 5))
                 )
 
-        if 1000 > frames > 500 and frames % 50 == 0:
-
-            things.append (
-                Bullet (-60, math.pi / 2, 2, (255, 255, 0), (w / 2, h), (5, 5))
-            )
 
         for t in things:
             try:

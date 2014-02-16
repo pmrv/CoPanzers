@@ -26,7 +26,7 @@ class Turret (GameObject):
 
         if not self.target:
             try:
-                self.target = next (filter (lambda x: hasattr (x, "health"), others))
+                self.target = next (filter (lambda x: x.tags ["class"] == "Barrier", others))
             except StopIteration:
                 return 
 
