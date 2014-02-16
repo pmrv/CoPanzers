@@ -17,6 +17,7 @@ class Turret (GameObject):
 
         GameObject.__init__ (self, *args, **kw)
         target.init (self, hp)
+        self.tags ["class"] = "Turret"
 
     def step (self, others, dt):
 
@@ -42,13 +43,13 @@ class Turret (GameObject):
         dy = tpos [1] - mpos [1]
         angle = math.acos (dx / math.sqrt (dx ** 2 + dy ** 2))
 
-        bullet = self.cannon.shoot (angle, mpos)
+        bullet = self.cannon.shoot (-angle)
         others.append (bullet)
 
     def draw (self, surface):
 
         GameObject.draw (self, surface)
-        self.cannon.draw (surface, self.position)
+        self.cannon.draw (surface)
         target.draw (self, surface)
 
         if self.target:
@@ -56,10 +57,16 @@ class Turret (GameObject):
 
 class ExampleTurret (Turret):
 
+    __amount = 0 # amount of turrets instantiated 
+
     def __init__ (self, *args, **kw):
 
         s = pygame.Surface ((30, 30))
         s.set_colorkey ( (0, 0, 0) )
         pygame.draw.polygon (s, (0, 155, 0), ((0, 15), (15, 0), (30, 15), (15, 30)))
         pygame.draw.polygon (s, (0, 0, 0), ((0, 15), (15, 0), (30, 15), (15, 30)), 1)
-        Turret.__init__ (self, 80, weapon.ExampleWeapon (), s, *args, **kw)
+        Turret.__init__ (self, 80, weapon.ExampleWeapon (self), s, *args, **kw)
+
+        self.__amount += 1
+        self.tags ["kind"] = "ExampleTurret"
+        self.tags ["name"] = "{} {}".format (self.tags ["kind"], self.__amount)

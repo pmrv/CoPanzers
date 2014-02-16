@@ -9,7 +9,6 @@ class GameObject:
         texture   -- pygame Surface or pygame Color
         position  -- 2 tuple of int, initial position on the screen
         hitbox    -- 2 tuple of int, size of the hitbox of the object
-        hitpoints -- int
         """
 
         self.hitbox = Rect ( position, hitbox )
@@ -24,6 +23,13 @@ class GameObject:
             raise TypeError ("Parameter $texture must be a pygame Surface or Color.")
 
         self.position = list (position)
+        # holds misc data about the object
+        # class -- what class of objects does it belongs to? Turret/Bullet/Whatever
+        # kind  -- what kind of Turret/Bullet/Whatever is it?
+        # team  -- objects with the same self.tags["team"] e.g. should normally not attack each other
+        # name  -- name for display, should be unique but does not have to be, 
+        #          use id(obj) if you need a unique identifier
+        self.tags = {"class": None, "kind": None, "team": None, "name": None} 
 
     def step (self, other_game_objects, relative_time):
         """

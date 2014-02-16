@@ -17,6 +17,7 @@ class Bullet (GameObject):
         self.dy = math.sin (direction) * speed
 
         GameObject.__init__ (self, *args, **kw)
+        self.tags ["class"] = "Bullet"
 
     def step (self, others, dt):
 
