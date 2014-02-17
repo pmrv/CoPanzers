@@ -1,8 +1,9 @@
 import math, pygame
 
 from pytanks import GameObject
-import pytanks.weapon as weapon
-import pytanks.target as target
+from pytanks import weapon
+from pytanks import target
+from pytanks.util import make_color_surface
 
 class Turret (GameObject):
 
@@ -32,20 +33,16 @@ class Turret (GameObject):
         self.cannon.draw (surface)
         target.draw (self, surface)
 
-        if self.target:
-            pygame.draw.circle (surface, (255, 0, 0), tuple (map (int, self.target.position)), 20, 1)
-
 class ExampleTurret (Turret):
 
     __amount = 0 # amount of turrets instantiated 
 
     def __init__ (self, *args, **kw):
 
-        s = pygame.Surface ((30, 30))
-        s.fill ( (255, 255, 255) )
+        s = make_color_surface (30, 30, (255, 255, 255))
         pygame.draw.polygon (s, (0, 155, 0), ((0, 15), (15, 0), (30, 15), (15, 30)))
         pygame.draw.polygon (s, (0, 0, 0), ((0, 15), (15, 0), (30, 15), (15, 30)), 1)
-        Turret.__init__ (self, 80, weapon.ExampleWeapon (self), s, *args, **kw)
+        Turret.__init__ (self, 80, weapon.ExampleWeapon (self), s, s.get_size (), *args, **kw)
 
         self.__amount += 1
         self.tags ["kind"] = "ExampleTurret"

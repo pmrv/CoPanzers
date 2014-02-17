@@ -18,17 +18,17 @@ def main (fps, w, h):
     things  = []
     frames  = 0
 
-    things.append (Barrier ( 10, (155, 50, 0), (w / 2, 100), (w / 4, 20) ))
-    things.append (Barrier ( 10, (155, 50, 0), (50, 50), (20, 20) ))
-    things.append (Barrier ( 10, (155, 50, 0), (50 + 1*(w - 100)/2, 50), (20, 20) ))
-    things.append (Barrier ( 10, (155, 50, 0), (50 + 2*(w - 100)/2, 50), (20, 20) ))
+    things.append (Barrier ( 10, (155, 50, 0), (w / 4, 20), (w / 2, 100) ))
+    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50, 50) ))
+    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50 + 1*(w - 100)/2, 50) ))
+    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50 + 2*(w - 100)/2, 50) ))
 
-    things.append (ExampleTurret ((w * .9, h * .9), (30, 30)))
-    things.append (ExampleTurret ((w * .1, h * .9), (30, 30)))
+    things.append (ExampleTurret ((w * .9, h * .9)))
+    things.append (ExampleTurret ((w * .1, h * .9)))
 
     joy = pygame.joystick.Joystick (0)
     joy.init ()
-    things.append (JoystickTank (joy, (0, h / 2), (60, 40)))
+    things.append (JoystickTank (joy, (0, h / 2)))
 
     while 1:
 
@@ -42,14 +42,14 @@ def main (fps, w, h):
 
             for i in range (6):
                 things.append (
-                    Bullet (1, 2, 50, -math.pi / 2, (255, 255, 0), (w / 4 + w / 10 * i, h - 10), (5, 5))
+                    Bullet (1, 2, 50, -math.pi / 2, (255, 255, 0), (5, 5), (w / 4 + w / 10 * i, h - 10))
                 )
 
         if frames == 200:
 
             for i in range (6):
                 things.append (
-                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, (255, 255, 0), (w / 2, h - 10), (5, 5))
+                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, (255, 255, 0), (5, 5), (w / 2, h - 10))
                 )
 
 

@@ -28,6 +28,7 @@ def step (self, _, dt):
     if self.speed:
         self.position [0] += self.dx * dt
         self.position [1] += self.dy * dt
+        self.hitbox.center = self.position
 
 def draw (self, surface):
 

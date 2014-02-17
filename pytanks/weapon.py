@@ -1,7 +1,7 @@
 import math, pygame
 
 from pytanks.bullet import Bullet
-from pytanks.util   import Rect
+from pytanks.util   import Rect, make_color_surface
 
 class Weapon:
 
@@ -50,7 +50,7 @@ class Weapon:
         dposx = math.cos (angle) * d 
         dposy = math.sin (angle) * d
         b = Bullet (self.bullet_hp, self.damage, self.muzzle_speed, angle, 
-                    (255, 255, 0), (pos [0] + rpos [0] + dposx, pos [1] + rpos [1] + dposy), (5, 5),
+                    (255, 255, 0), (5, 5), (pos [0] + rpos [0] + dposx, pos [1] + rpos [1] + dposy),
                     root = self.root)
 
         # not really content with that

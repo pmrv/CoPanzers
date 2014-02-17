@@ -1,6 +1,8 @@
 import pygame, math
+
 from pytanks import GameObject, mobile, target
 from pytanks.weapon import ExampleWeapon
+from pytanks.util import make_color_surface
 
 class Tank (GameObject):
 
@@ -42,10 +44,8 @@ class JoystickTank (Tank):
         """
 
         self.joystick = joystick
-        s = pygame.Surface ( (60, 40) )
-        s.set_colorkey ( (0, 0, 0) )
-        s.fill ( (0, 155, 0) )
-        Tank.__init__ (self, 100, 40, ExampleWeapon (self), s, *args, **kw)
+        s = make_color_surface (60, 40, (0, 200, 100))
+        Tank.__init__ (self, 100, 40, ExampleWeapon (self), s, (60, 40), *args, **kw)
 
     def step (self, others, dt):
 
