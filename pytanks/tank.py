@@ -43,7 +43,8 @@ class JoystickTank (Tank):
 
         self.joystick = joystick
         s = pygame.Surface ( (60, 40) )
-        s.fill ( (0, 255, 0) )
+        s.set_colorkey ( (0, 0, 0) )
+        s.fill ( (0, 155, 0) )
         Tank.__init__ (self, 100, 40, ExampleWeapon (self), s, *args, **kw)
 
     def step (self, others, dt):
@@ -59,7 +60,7 @@ class JoystickTank (Tank):
         self.speed = throttle * self.max_speed
         if jy == 0 and jx != 0:
             self.direction = math.pi * (jx < 0)
-        elif jx != 0:
+        elif not (jx == jy == 0):
             self.direction = math.acos (jx / math.sqrt (jx ** 2 + jy ** 2)) * jy / abs (jy)
 
         Tank.step (self, others, dt)

@@ -32,10 +32,9 @@ def step (self, _, dt):
 def draw (self, surface):
 
     pos = self.position
-    tsurf = pygame.transform.rotate (self.texture, math.degrees (-self.direction - math.pi / 2))
+    tsurf = pygame.transform.rotate (self.texture, math.degrees (-self.direction))
     dest = tsurf.get_rect ()
     dest.center = (pos [0], pos [1])
-
     surface.blit (tsurf, dest) 
 
 def get_speed (self):
