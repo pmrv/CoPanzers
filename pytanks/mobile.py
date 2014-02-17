@@ -1,7 +1,8 @@
 """
 Objects that can move in a certain direction with a certain speed
 and (might) change that direction.
-Direction/Speed is set/get via the property
+Direction/Speed is set/get via a property
+(propert (mobile.get_*, mobile.set_*))
 (as of now, since there are no accelarations yet).
 If direction or speed should be immutable, modify the property
 accordingly, but make sure they are always set with the provided
@@ -31,15 +32,9 @@ def step (self, _, dt):
 def draw (self, surface):
 
     pos = self.position
-    #if self.direction - math.pi/2 > 1e-1:
     tsurf = pygame.transform.rotate (self.texture, math.degrees (-self.direction - math.pi / 2))
     dest = tsurf.get_rect ()
     dest.center = (pos [0], pos [1])
-    """
-    else:
-        tsurf = self.texture
-        dest  = self.hitbox
-    """
 
     surface.blit (tsurf, dest) 
 
@@ -49,8 +44,8 @@ def get_speed (self):
 def set_speed (self, speed):
 
     self._speed = speed
-    self.dx = math.cos (angle) * self._speed
-    self.dy = math.sin (angle) * self._speed
+    self.dx = math.cos (self.direction) * self._speed
+    self.dy = math.sin (self.direction) * self._speed
 
 def get_dir (self):
     return self._dir

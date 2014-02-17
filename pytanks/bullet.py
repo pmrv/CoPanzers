@@ -10,23 +10,27 @@ class Bullet (GameObject):
     direction = property (mobile.get_dir)
     speed     = property (mobile.get_speed)
 
-    def __init__ (self, hp, damage, speed, direction, *args, **kw):
+    def __init__ (self, hp, damage, speed, direction, *args, root = None, **kw):
         """
         hp     -- int, how much damage the bullet itself can take
         damage -- int, how much damage the bullet does on impact
+        root   -- pytanks.GameObject, ignore this object when hitting something
         """
 
         self.damage = damage
+        self.root = root
 
         GameObject.__init__ (self, *args, **kw)
         mobile.init (self, speed, direction)
         target.init (self, hp)
         self.tags ["class"] = "Bullet"
 
+    hit = target.hit
+
     def step (self, others, dt):
 
         for o in others:
-            if self.hitbox.colliderect (o.hitbox) and hasattr (o, "hit"):
+            if hasattr (o, "hit") and id (self.root) != id (o) != id (self) and self.hitbox.colliderect (o.hitbox):
                 o.hit (self.damage, self)
                 raise Destroyed ("Bullet hit something.")
 
@@ -36,4 +40,3 @@ class Bullet (GameObject):
 
     def draw (self, surface):
         mobile.draw (self, surface)
-

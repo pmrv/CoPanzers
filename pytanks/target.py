@@ -11,17 +11,17 @@ def init (self, hp, center = None, size = None, *args):
     takes the object for invincible
     hp -- int
     center, size -- 2 tuple of int, describing position and
-                    size of the healthbar
+                    size of the healthbar, center is relative
+                    to $self.position
     """
 
     if center == None:
-        center = list (self.hitbox.center)
-        center [1] -= self.hitbox.height * .75
+        center = 0, -self.hitbox.height * .75
     if size == None:
         size = (.75 * self.hitbox.width, 5)
 
     if hp > 0:
-        self.health = HealthBar (hp, center, size, *args)
+        self.health = HealthBar (hp, center, size, self, *args)
 
 def draw (self, surface):
     if hasattr (self, "health"):
@@ -40,7 +40,7 @@ def hit (self, damage, aggressor):
 
 class HealthBar:
 
-    def __init__ (self, max_hp, center, size, fg = (0, 255, 0), bg = (255, 0, 0)):
+    def __init__ (self, max_hp, center, size, root, fg = (0, 255, 0), bg = (255, 0, 0)):
         """
         draws a health bar at a given point for a given number of health points
         max_hp -- int, full hp
@@ -50,16 +50,19 @@ class HealthBar:
         """
 
         self.hp, self.max_hp = max_hp, max_hp
-        self.height = size [1] - 2
-        self.dwidth = size [0] / max_hp
-        self.topleft  = center [0] - (size [0] - 2) / 2, center [1] - (size [1] - 2) / 2
+        self.height =  size [1] - 2
+        self.dwidth = (size [0] - 2)/ max_hp
+        self.center = center
+        self.root = root
         self.fg, self.bg = fg, bg
 
     def draw (self, surface):
 
-        pygame.draw.rect (surface, self.fg, (self.topleft, (self.hp * self.dwidth - 1, self.height)))
+        pos = self.root.position
+        topleft = pos [0] + self.center [0] - self.hp * self.dwidth / 2, pos [1] + self.center [1] - self.height / 2
+        pygame.draw.rect (surface, self.fg, (topleft, (self.hp * self.dwidth - 1, self.height)))
         if self.hp < self.max_hp:
-            pygame.draw.rect (surface, self.bg, ((self.topleft [0] + self.hp * self.dwidth, self.topleft [1]), 
+            pygame.draw.rect (surface, self.bg, ((topleft [0] + self.hp * self.dwidth, topleft [1]), 
                                        ((self.max_hp - self.hp) * self.dwidth - 1, self.height)))
-        pygame.draw.rect (surface, (0, 0, 0), ((self.topleft [0] - 1, self.topleft [1] - 1),
+        pygame.draw.rect (surface, (0, 0, 0), ((topleft [0] - 1, topleft [1] - 1),
                                                (self.dwidth * self.max_hp, self.height + 2)), 1)

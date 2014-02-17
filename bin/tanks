@@ -7,8 +7,11 @@ from pytanks.barrier import Barrier
 from pytanks.bullet  import Bullet
 from pytanks.turret  import ExampleTurret
 from pytanks.util    import Destroyed
+from pytanks.tank    import JoystickTank
 
 def main (fps, w, h):
+
+    pygame.init ()
 
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
@@ -22,6 +25,10 @@ def main (fps, w, h):
 
     things.append (ExampleTurret ((w * .9, h * .9), (30, 30)))
     things.append (ExampleTurret ((w * .1, h * .9), (30, 30)))
+
+    joy = pygame.joystick.Joystick (0)
+    joy.init ()
+    things.append (JoystickTank (joy, (0, h / 2), (60, 40)))
 
     while 1:
 
