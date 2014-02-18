@@ -1,37 +1,38 @@
 import math, pygame
 
-from pytanks import GameObject
-from pytanks import weapon
-from pytanks import target
+from pytanks import GameObject, target, mount
+from pytanks.weapon import ExampleWeapon
 from pytanks.util import make_color_surface
 
 class Turret (GameObject):
 
-    def __init__ (self, hp, cannon, *args, **kw):
+    def __init__ (self, hp, mountpoints, *args, **kw):
         """
         hp     -- int, hitpoints for the turret
-        cannon -- pytanks.weapon.Weapon, the cannon for this turret
+        mountpoints -- see pytanks.mount.init
         """
 
-        self.cannon = cannon
         self.target = None
 
         GameObject.__init__ (self, *args, **kw)
-        target.init (self, hp)
         self.tags ["class"] = "Turret"
 
+        target.init (self, hp)
+        mount.init (self, mountpoints)
+
     hit = target.hit
+    insert = mount.insert
 
     def step (self, others, dt):
 
-        self.cannon.step (dt)
         target.step (self, others, dt)
+        mount.step (self, others, dt)
 
     def draw (self, surface):
 
         GameObject.draw (self, surface)
-        self.cannon.draw (surface)
         target.draw (self, surface)
+        mount.draw (self, surface)
 
 class ExampleTurret (Turret):
 
@@ -42,7 +43,8 @@ class ExampleTurret (Turret):
         s = make_color_surface (30, 30, (255, 255, 255))
         pygame.draw.polygon (s, (0, 155, 0), ((0, 15), (15, 0), (30, 15), (15, 30)))
         pygame.draw.polygon (s, (0, 0, 0), ((0, 15), (15, 0), (30, 15), (15, 30)), 1)
-        Turret.__init__ (self, 80, weapon.ExampleWeapon (self), s, s.get_size (), *args, **kw)
+        Turret.__init__ (self, 80, ((0, 0),), s, s.get_size (), *args, **kw)
+        self.insert (0, ExampleWeapon ())
 
         self.__amount += 1
         self.tags ["kind"] = "ExampleTurret"
@@ -51,6 +53,11 @@ class ExampleTurret (Turret):
     def step (self, others, dt):
 
         Turret.step (self, others, dt)
+        if self.mounts [0] == None:
+            return # we've nothing mounted yet
+
+        if self.mounts [0].reloaded > 0:
+            return
 
         if not self.target:
             try:
@@ -62,15 +69,15 @@ class ExampleTurret (Turret):
             self.target = None
             return
 
-        if self.cannon.reloaded > 0:
-            return # our weapon is not ready to fire
-
         mpos = self.position
         tpos = self.target.position
         dx = tpos [0] - mpos [0]
         dy = tpos [1] - mpos [1]
 
-        angle = math.acos (dx / math.sqrt (dx ** 2 + dy ** 2))
+        if dy == 0:
+            angle = math.pi * (dx > 0)
+        else:
+            angle = math.acos (dx / math.sqrt (dx ** 2 + dy ** 2))
 
-        bullet = self.cannon.shoot (-angle)
+        bullet = self.mounts [0].shoot (-angle)
         others.append (bullet)

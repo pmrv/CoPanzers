@@ -2,8 +2,7 @@
 Objects that can move in a certain direction with a certain speed
 and (might) change that direction.
 Direction/Speed is set/get via a property
-(propert (mobile.get_*, mobile.set_*))
-(as of now, since there are no accelarations yet).
+(propert (mobile.get_*, mobile.set_*)).
 If direction or speed should be immutable, modify the property
 accordingly, but make sure they are always set with the provided
 setter functions.

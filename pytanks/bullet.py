@@ -14,7 +14,10 @@ class Bullet (GameObject):
         """
         hp     -- int, how much damage the bullet itself can take
         damage -- int, how much damage the bullet does on impact
+        speed  -- int, px/s
+        direction -- float, radians
         root   -- pytanks.GameObject, ignore this object when hitting something
+                  (usually the object firing this bullet)
         """
 
         self.damage = damage
@@ -40,3 +43,10 @@ class Bullet (GameObject):
 
     def draw (self, surface):
         mobile.draw (self, surface)
+
+class ExampleBullet (Bullet):
+
+    def __init__ (self, angle, *args, **kw):
+        # as per usual, some random values as an example
+        Bullet.__init__ (self, 1, 1, 80, angle, (255, 255, 0), (5, 5), *args, **kw)
+        self.tags ["kind"] = "ExampleBullet"

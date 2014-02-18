@@ -42,16 +42,9 @@ def main (fps, w, h):
 
             for i in range (6):
                 things.append (
-                    Bullet (1, 2, 50, -math.pi / 2, (255, 255, 0), (5, 5), (w / 4 + w / 10 * i, h - 10))
+                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, 
+                            (155, 155, 0), (5, 5), (w / 4 + w / 10 * i, h - 10))
                 )
-
-        if frames == 200:
-
-            for i in range (6):
-                things.append (
-                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, (255, 255, 0), (5, 5), (w / 2, h - 10))
-                )
-
 
         for t in things:
             try:

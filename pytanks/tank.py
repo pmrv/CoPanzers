@@ -1,6 +1,6 @@
 import pygame, math
 
-from pytanks import GameObject, mobile, target
+from pytanks import GameObject, mobile, target, mount
 from pytanks.weapon import ExampleWeapon
 from pytanks.util import make_color_surface
 
@@ -9,31 +9,31 @@ class Tank (GameObject):
     direction = property (mobile.get_dir,   mobile.set_dir)
     speed     = property (mobile.get_speed, mobile.set_speed)
 
-    def __init__ (self, hp, max_speed, cannon, *args, **kw):
+    def __init__ (self, hp, mountpoints, max_speed, *args, **kw):
         """
         hp        -- int
         max_speed -- int, maximum speed the tank can drive
-        cannon    -- pytanks.weapon.Weapon, cannon to mount on this tank
+        mountpoints -- see pytanks.mount.init
         """
 
         GameObject.__init__ (self, *args, **kw)
         target.init (self, hp)
         mobile.init (self, 0, 0)
-        self.cannon = cannon
+        mount.init (self, mountpoints)
         self.max_speed = max_speed
 
     hit = target.hit
+    insert = mount.insert
 
     def step (self, others, dt):
         mobile.step (self, others, dt)
         target.step (self, others, dt)
-        self.cannon.step (dt)
-        GameObject.step (self, others, dt)
+        mount.step  (self, others, dt)
 
     def draw (self, surface):
         mobile.draw (self, surface)
         target.draw (self, surface)
-        self.cannon.draw (surface)
+        mount.draw (self, surface)
 
 
 class JoystickTank (Tank):
@@ -45,7 +45,8 @@ class JoystickTank (Tank):
 
         self.joystick = joystick
         s = make_color_surface (60, 40, (0, 200, 100))
-        Tank.__init__ (self, 100, 40, ExampleWeapon (self), s, (60, 40), *args, **kw)
+        Tank.__init__ (self, 100, ((0, 0),), 40, s, (60, 40), *args, **kw)
+        self.insert (0, ExampleWeapon ()) 
 
     def step (self, others, dt):
 

@@ -1,35 +1,28 @@
 import math, pygame
 
-from pytanks.bullet import Bullet
+from pytanks import GameObject, mobile, mountable
+from pytanks.bullet import ExampleBullet
 from pytanks.util   import Rect, make_color_surface
 
-class Weapon:
+class Weapon (GameObject):
 
-    def __init__ (self, surface, reload_time, bullet_hp, damage, 
-                  muzzle_speed, relative_position, kind, root):
+    direction = property (mobile.get_dir, mobile.set_dir)
+    speed     = property (mobile.get_speed)
+
+    def __init__ (self, reload_time, bullet, *args, **kw):
         """
         surface           -- pygame.Surface, what the weapon looks like
         reload_time       -- float
-        bullet_hp         -- int, how much damage the bullet itself can take
-        damage            -- int, how much damage the bullet does on impact
-        muzzle_speed      -- int, px/sec
-        relative_position -- 2 tuple of int, center of the weapon 
-                             relative to object it is attached to
-        kind              -- str, the kind with which our bullets are tagged
-        root              -- pytanks.GameObject, the object this weapon is placed on
+        bullet            -- pytanks.bullet.Bullet, bullets this weapon shoots
         """
 
-        self.relative_position = relative_position
-        self.muzzle_speed = muzzle_speed
         self.reload_time = reload_time
-        self.bullet_hp = bullet_hp
-        self.surface = surface
-        self.damage = damage
-        self.root = root
-        self.kind = kind 
+        self.bullet = bullet
 
-        self.rotation = math.pi / 2 # direction in which the last bullet was fired
         self.reloaded = 0
+        GameObject.__init__ (self, *args, **kw)
+        mobile.init (self, 0, 0)
+        mountable.init (self)
 
     def shoot (self, angle):
         """
@@ -40,43 +33,47 @@ class Weapon:
 
         if self.reloaded > 0: return None
 
-        self.reloaded = self.reload_time
-        self.rotation = -angle
+        self.reloaded  = self.reload_time
+        self.direction = angle
         pos  = self.root.position
         rpos = self.relative_position
         # we need to place the bullet just outside the weapon because it looks
         # stupid when the bullets spawn at the center of the weapon
-        d = self.surface.get_height () / 2
+        d = self.texture.get_height () / 2
         dposx = math.cos (angle) * d 
         dposy = math.sin (angle) * d
-        b = Bullet (self.bullet_hp, self.damage, self.muzzle_speed, angle, 
-                    (255, 255, 0), (5, 5), (pos [0] + rpos [0] + dposx, pos [1] + rpos [1] + dposy),
-                    root = self.root)
+        b = self.bullet (angle, (pos [0] + rpos [0] + dposx, pos [1] + rpos [1] + dposy),
+                         root = self.root)
 
-        # not really content with that
-        b.tags ["kind"] = self.kind
         b.tags ["team"] = self.root.tags ["team"]
         return b
 
-    def step (self, dt):
-        self.reloaded -= dt
+    def step (self, game_objects, dt):
+        if self.reloaded > 0:
+            self.reloaded -= dt 
 
-    def draw (self, surface):
         pos  = self.root.position
         rpos = self.relative_position
-        tsurf = pygame.transform.rotate (self.surface, math.degrees (self.rotation - math.pi / 2))
-        dest = tsurf.get_rect ()
-        dest.center = (pos [0] + rpos [0], pos [1] + rpos [1])
-        surface.blit (tsurf, dest) 
+        self.position [0] += pos [0] + rpos [0]
+        self.position [1] += pos [1] + rpos [1]
+
+        mobile.step (self, game_objects, dt)
+        mountable.step (self, game_objects, dt)
+
+    def draw (self, surface):
+        mobile.draw (self, surface)
 
 class ExampleWeapon (Weapon):
 
-    def __init__ (self, *args, **kw):
+    def __init__ (self):
 
         h, w = 20, 20
         s = pygame.Surface ((h, w))
         s.set_colorkey ( (0, 0, 0) )
-        pygame.draw.polygon (s, (0, 0, 150), ((0, h/2), (w, h/2), (w/2, 0)))
+        pygame.draw.polygon (s, (0, 0, 150), ((w/2, 0), (w/2, h), (w, h/2)))
 
         # some arbitrarily chosen values
-        Weapon.__init__ (self, s, .1, 1, 1, 80, (0, 0), "ExampleWeapon", *args, **kw) 
+        # our hitbox is (0, 0) since we are no target
+        # we give (0, 0) as position, since our real position will
+        # later be set by mount.insert
+        Weapon.__init__ (self, .1, ExampleBullet, s, (0, 0), (0, 0)) 
