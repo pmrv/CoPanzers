@@ -40,6 +40,8 @@ def insert (self, point_id, gadget):
     rpos = gadget.relative_position
     gadget.position [0] = rpos [0] + pos [0]
     gadget.position [1] = rpos [1] + pos [1]
+    if hasattr (gadget, "hitbox"):
+        gadget.hitbox.center = gadget.position
 
     self.mounts [point_id] = gadget
 

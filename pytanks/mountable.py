@@ -17,7 +17,8 @@ def step (self, game_objects, dt):
         rpos = self.relative_position
         self.position [0] = rpos [0] + pos [0]
         self.position [1] = rpos [1] + pos [1]
-        self.hitbox.center = self.position
+        if hasattr (self, "hitbox"):
+            self.hitbox.center = self.position
 
 def draw (self, _):
     # for completeness' sake

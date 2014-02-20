@@ -3,20 +3,23 @@ Objects which can be shot at and take damage.
 """
 
 import pygame
-from .util import Destroyed
+from .util import Destroyed, Rect
 
-def init (self, hp, center = None, size = None, *args):
+def init (self, hp, hitbox, center = None, size = None, *args):
     """
     inits a health bar when hp > 0 else 
     takes the object for invincible
-    hp -- int
+    hp           -- int
+    hitbox       -- 2 tuple of int, size of the hitbox of the object
     center, size -- 2 tuple of int, describing position and
                     size of the healthbar, center is relative
                     to $self.position
     """
 
+    self.hitbox = Rect (self.position, hitbox)
+
     if center == None:
-        center = 0, -self.hitbox.height * .75
+        center = 0, - self.hitbox.height * .75
     if size == None:
         size = (.75 * self.hitbox.width, 5)
 
@@ -59,7 +62,7 @@ class HealthBar:
     def draw (self, surface):
 
         pos = self.root.position
-        topleft = pos [0] + self.center [0] - self.hp * self.dwidth / 2, pos [1] + self.center [1] - self.height / 2
+        topleft = pos [0] + self.center [0] - self.max_hp * self.dwidth / 2, pos [1] + self.center [1] - self.height / 2
         pygame.draw.rect (surface, self.fg, (topleft, (self.hp * self.dwidth - 1, self.height)))
         if self.hp < self.max_hp:
             pygame.draw.rect (surface, self.bg, ((topleft [0] + self.hp * self.dwidth, topleft [1]), 

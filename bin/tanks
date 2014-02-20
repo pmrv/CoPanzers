@@ -4,9 +4,9 @@ import pygame, math
 from pygame.locals import *
 
 from pytanks.barrier import Barrier
-from pytanks.bullet  import Bullet
+from pytanks.bullet  import ExampleBullet
 from pytanks.turret  import ExampleTurret
-from pytanks.util    import Destroyed
+from pytanks.util    import Destroyed, make_color_surface
 from pytanks.tank    import JoystickTank
 
 def main (fps, w, h):
@@ -18,10 +18,12 @@ def main (fps, w, h):
     things  = []
     frames  = 0
 
-    things.append (Barrier ( 10, (155, 50, 0), (w / 4, 20), (w / 2, 100) ))
-    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50, 50) ))
-    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50 + 1*(w - 100)/2, 50) ))
-    things.append (Barrier ( 10, (155, 50, 0), (20, 20), (50 + 2*(w - 100)/2, 50) ))
+    s1 = make_color_surface (w / 4, 20, (155, 50, 0))
+    things.append (Barrier ( 10, (w / 4, 20), s1, (w / 2, 100) ))
+    s2 = make_color_surface (20, 20, (155, 50, 0))
+    things.append (Barrier ( 10, (20, 20), s2, (50, 50) ))
+    things.append (Barrier ( 10, (20, 20), s2, (50 + 1*(w - 100)/2, 50) ))
+    things.append (Barrier ( 10, (20, 20), s2, (50 + 2*(w - 100)/2, 50) ))
 
     things.append (ExampleTurret ((w * .9, h * .9)))
     things.append (ExampleTurret ((w * .1, h * .9)))
@@ -42,8 +44,7 @@ def main (fps, w, h):
 
             for i in range (6):
                 things.append (
-                    Bullet (1, 2, 50, -math.pi / 3 - math.pi / 15 * i, 
-                            (155, 155, 0), (5, 5), (w / 4 + w / 10 * i, h - 10))
+                    ExampleBullet (- math.pi / 3 - math.pi / 15 * i, (w / 4 + w / 10 * i, h - 10))
                 )
 
         for t in things:

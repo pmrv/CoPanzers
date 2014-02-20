@@ -11,7 +11,6 @@ class Weapon (GameObject):
 
     def __init__ (self, reload_time, bullet, *args, **kw):
         """
-        surface           -- pygame.Surface, what the weapon looks like
         reload_time       -- float
         bullet            -- pytanks.bullet.Bullet, bullets this weapon shoots
         """
@@ -76,4 +75,4 @@ class ExampleWeapon (Weapon):
         # our hitbox is (0, 0) since we are no target
         # we give (0, 0) as position, since our real position will
         # later be set by mount.insert
-        Weapon.__init__ (self, .1, ExampleBullet, s, (0, 0), (0, 0)) 
+        Weapon.__init__ (self, .1, ExampleBullet, s, (0, 0)) 

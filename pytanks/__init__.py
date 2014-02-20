@@ -4,23 +4,16 @@ from .util import Rect, make_color_surface
 
 class GameObject:
 
-    def __init__ (self, texture, hitbox, position):
+    def __init__ (self, texture, position):
         """
         texture  -- pygame Surface or pygame Color
-        hitbox   -- 2 tuple of int, size of the hitbox of the object
         position -- 2 tuple of int, initial position (centered) on the screen
         """
 
-        self.hitbox = Rect ( position, hitbox )
+        if not isinstance (texture, pygame.Surface):
+            raise TypeError ("Parameter $texture must be a pygame Surface.")
 
-        if isinstance (texture, pygame.Surface):
-            self.texture = texture
-        elif isinstance (texture, (pygame.Color, tuple)):
-            self.texture = make_color_surface (self.hitbox.width, self.hitbox.height, texture)
-            pygame.draw.rect (self.texture, (0, 0, 0), self.texture.get_rect (), 1)
-        else:
-            raise TypeError ("Parameter $texture must be a pygame Surface or Color.")
-
+        self.texture = texture
         self.position = list (position)
         # holds misc data about the object
         # class -- what class of objects does it belongs to? Turret/Bullet/Whatever

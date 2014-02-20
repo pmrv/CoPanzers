@@ -19,15 +19,16 @@ def init (self, speed, angle):
     self._dir   = angle
     # first time initialization in case the object uses
     # direction/speed as read only values
-    self.dx = math.cos (angle) * self.speed
-    self.dy = math.sin (angle) * self.speed
+    self.dx = math.cos (angle) * speed
+    self.dy = math.sin (angle) * speed
 
 def step (self, _, dt):
 
     if self.speed:
         self.position [0] += self.dx * dt
         self.position [1] += self.dy * dt
-        self.hitbox.center = self.position
+        if hasattr (self, "hitbox"):
+            self.hitbox.center = self.position
 
 def draw (self, surface):
 

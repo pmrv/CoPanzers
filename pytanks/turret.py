@@ -6,10 +6,10 @@ from pytanks.util import make_color_surface
 
 class Turret (GameObject):
 
-    def __init__ (self, hp, mountpoints, *args, **kw):
+    def __init__ (self, mountpoints, hp, hitbox, *args, **kw):
         """
-        hp     -- int, hitpoints for the turret
         mountpoints -- see pytanks.mount.init
+        hp, hitbox  -- see pytanks.target.init
         """
 
         self.target = None
@@ -17,7 +17,7 @@ class Turret (GameObject):
         GameObject.__init__ (self, *args, **kw)
         self.tags ["class"] = "Turret"
 
-        target.init (self, hp)
+        target.init (self, hp, hitbox)
         mount.init (self, mountpoints)
 
     hit = target.hit
@@ -43,7 +43,7 @@ class ExampleTurret (Turret):
         s = make_color_surface (30, 30, (255, 255, 255))
         pygame.draw.polygon (s, (0, 155, 0), ((0, 15), (15, 0), (30, 15), (15, 30)))
         pygame.draw.polygon (s, (0, 0, 0), ((0, 15), (15, 0), (30, 15), (15, 30)), 1)
-        Turret.__init__ (self, 80, ((0, 0),), s, s.get_size (), *args, **kw)
+        Turret.__init__ (self, ((0, 0),), 80, s.get_size (), s, *args, **kw)
         self.insert (0, ExampleWeapon ())
 
         self.__amount += 1

@@ -3,9 +3,9 @@ import pytanks.target as target
 
 class Barrier (GameObject):
 
-    def __init__ (self, hp, *args, **kw):
+    def __init__ (self, hp, hitbox, *args, **kw):
         GameObject.__init__ (self, *args, **kw)
-        target.init (self, hp)
+        target.init (self, hp, hitbox)
         self.tags ["class"] = "Barrier"
 
     hit = target.hit
