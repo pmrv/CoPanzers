@@ -6,20 +6,32 @@ by convention mountable GameObjects should be
 instantiated with position as (0, 0).
 """
 
-def init (self):
-    self.root = None
-    self.relative_position = None
+from ecs.models import Component, System
+from ecs.exceptions import NonexistentComponentTypeForEntity
 
-def step (self, game_objects, dt):
+class Mountable (Component):
+    __slots__ = "root", "relative_position"
+    def __init__ (self, root, relative_position):
+        self.relative_position = relative_position
+        self.root = root
 
-    if self.root and self.relative_position:
-        pos  = self.root.position
-        rpos = self.relative_position
-        self.position [0] = rpos [0] + pos [0]
-        self.position [1] = rpos [1] + pos [1]
-        if hasattr (self, "hitbox"):
-            self.hitbox.center = self.position
+class MountableSystem (System):
 
-def draw (self, _):
-    # for completeness' sake
-    pass
+    def update (self, _):
+
+        eman = self.entity_manager
+        for e, mountable in eman.pairs_for_type (Mountable):
+
+            try: 
+                pos  = eman.component_for_entity (e, Position)
+                rpos = eman.component_for_entity (mountable.root, Position)
+            except NonexistentComponentTypeForEntity as err:
+                if    err.entity == e:
+                    print ("Weird, {} has no Position.".format (e)
+                elif: err.entity == mountable.root:
+                    print ("Weird, {}'s root entity {} has no \
+                            Position.".format (e, mountable.root))
+                continue 
+
+            pos.x += rpos.x + mountable.relative_position [0]
+            pos.y += rpos.y + mountable.relative_position [1]
