@@ -11,7 +11,12 @@ setter functions.
 import math
 from ecs.models import Component, System
 from ecs.exceptions import NonexistentComponentTypeForEntity
-### TODO: implement Hitbox & .target
+
+class Position (Component):
+
+    __slots__ = "x", "y"
+    def __init__ (self, x, y):
+        self.x, self.y = x, y
 
 class Movement (Component):
     ### TODO: expand this class to support accelerations for rotating/moving

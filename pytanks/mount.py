@@ -6,50 +6,51 @@ self.mountpoints. Use the indices of the latter
 as $point_id when calling self.mount().
 """
 
-def init (self, mountpoints):
-    """
-    mountpoints -- iterable of 2 tuple of int,
-                   list of relative coordinates of 
-                   the centers of the mountpoints
-    """
+from ecs.models import Component, System
+from ecs.exceptions import NonexistentComponentTypeForEntity
 
-    self.mountpoints = list (mountpoints)
-    self.mount_num   = len (self.mountpoints)
-    if self.mount_num == 0:
-        raise ValueError ("A mount without mounting points is pointless.")
-    self.mounts = [None] * self.mount_num
+from pytanks.movement import Position
 
-def insert (self, point_id, gadget):
-    """
-    point_id  -- int, from 0 to $self.mount_num, specifies 
-                 which mounting point to use
-    gadget -- pytanks.GameObject, the object to be place on
-                 the mounting point, must implement the mountable
-                 behaviour
-    """
+class Mount (Component):
 
-    if point_id >= self.mount_num:
-        raise KeyError ("Point id to high.")
-    if self.mounts [point_id]: 
-        raise KeyError ("Mounting point already taken.")
+    __slots__ = "points", "amount", "mounts"
 
-    gadget.root = self
-    gadget.relative_position = self.mountpoints [point_id]
+    def __init__ (self, points):
+        """
+        points -- iterable of 2 tuple of int,
+                  list of relative coordinates of 
+                  the centers of the mountpoints
+        """
 
-    pos  = self.position
-    rpos = gadget.relative_position
-    gadget.position [0] = rpos [0] + pos [0]
-    gadget.position [1] = rpos [1] + pos [1]
-    if hasattr (gadget, "hitbox"):
-        gadget.hitbox.center = gadget.position
+        self.points = tuple (points)
+        # maximum number of enitities in this mount
+        self.amount = len (self.points)
+        # list of all entities in this mount
+        # indices correspond with self.points
+        self.mounts = [None] * self.amount
 
-    self.mounts [point_id] = gadget
+class MountSystem (System):
 
-def step (self, game_objects, dt):
-    for m in self.mounts:
-        if m: 
-            m.step (game_objects, dt)
+    def update (self, dt):
 
-def draw (self, surface):
-    for m in self.mounts:
-        if m: m.draw (surface)
+        eman = self.entity_manager
+        for e, m in eman.pairs_for_type (Mount):
+
+            try: 
+                pos = eman.compononent_for_enitity (e, Position)
+            except NonexistentComponentTypeForEntity:
+                print ("Weird, entity {} has no Position.".format (e))
+                continue
+
+            for i in range (m.amount):
+                im = m.mounts [i]
+                if im is None: continue
+
+                try: 
+                    ipos = eman.compononent_for_enitity (im, Position)
+                    ipos.x += pos.x + m.points [i] [0]
+                    ipos.y += pos.y + m.points [i] [1]
+
+                except NonexistentComponentTypeForEntity:
+                    print ("Weird, entity {} has no Position.".format (im))
+                    continue
