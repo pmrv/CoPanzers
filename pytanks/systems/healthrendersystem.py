@@ -1,46 +1,7 @@
-"""
-Objects which can be shot at and take damage.
-"""
+from ecs.models import System
 
-import pygame
-from ecs.models import Component, System
-from ecs.exceptions import NonexistentComponentTypeForEntity
-
-# it seems weird to have all these different class 
-# just for one or two parameters
-
-### TODO: write helper functions to set sane defaults
-### TODO: implement RenderSystem
-class Hitbox (Component, pygame.Rect):
-    """
-    describes the area in which the entity can be hit _relative_
-    to the Position, that is, before using its .collide* methods
-    you will have to correctly set its center.
-    Only its .width/.height attributes matter.
-    """
-    pass
-
-class Health (Component):
-    __slots__ = "hp", "max_hp"
-    def __init__ (self, hp, max_hp):
-        """
-        hp     -- int, health points this entity (currently) has
-        max_hp -- int, health points this entity can have at most
-        """
-        self.hp = hp
-        self.max_hp = max_hp
-
-class HealthBar (Component, pygame.Rect):
-    pass
-
-class HealthSystem (System):
-
-    def update (self, _):
-
-        for e, health in self.entity_manager.pairs_for_type (Health):
-            if health.hp <= 0:
-                print ("Entity {} was destroyed.".format (e))
-                self.entity_manager.remove_entity (e)
+from pytanks.components.health   import HealthBar, Health
+from pytanks.components.position import Position
 
 class HealthbarRenderSystem (RenderSystem):
 
@@ -71,8 +32,8 @@ class HealthbarRenderSystem (RenderSystem):
 
             topleft_green [0] += pos.x
             topleft_green [1] += pos.y
-            topleft_red [0] += pos.x
-            topleft_red [1] += pos.y
+            topleft_red   [0] += pos.x
+            topleft_red   [1] += pos.y
 
             pygame.draw.rect (self.surface, (0, 255, 0), (topleft_green, size_green))
             pygame.draw.rect (self.surface, (255, 0, 0), (topleft_red, size_red))

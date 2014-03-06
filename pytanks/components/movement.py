@@ -10,7 +10,6 @@ setter functions.
 
 import math
 from ecs.models import Component, System
-from ecs.exceptions import NonexistentComponentTypeForEntity
 
 class Position (Component):
 
@@ -20,7 +19,7 @@ class Position (Component):
 
 class Movement (Component):
     ### TODO: expand this class to support accelerations for rotating/moving
-    __slots__ = "rotation", "speed"
+    __slots__ = "rotation", "speed", "dx", "dy"
     def __init__ (self, rotation, speed):
         """
         the rotation parameter is also used for entities that can rotate but
@@ -31,22 +30,11 @@ class Movement (Component):
         self.rotation = rotation
         self.speed = speed
 
-class MovingSystem (System):
+    @property
+    def dx (self):
+        return self.speed * math.cos (self.rotation)
 
-    def update (self, dt):
-        for e, vel in self.entity_manager.pairs_for_type (Movement):
-            try:
-                pos = self.entity_manager.component_for_entity (e, Position)
-            except NonexistentComponentTypeForEntity:
-                print ("No position component found for moving.")
-                continue # shouldn't be happening, but just to be sure
+    @property
+    def dy (self):
+        return self.speed * math.sin (self.rotation)
 
-            pos.x += vel.speed * math.cos (vel.rotation)
-            pos.y += vel.speed * math.sin (vel.rotation)
-
-            try:
-                hitbox = self.entity_manager.component_for_entity (e, Hitbox)
-                hitbox.center = pos.x, pos.y
-            except NonexistentComponentTypeForEntity:
-                print ("Entity has no hitbox, don't try to move it.")
-                continue

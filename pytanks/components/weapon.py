@@ -1,11 +1,12 @@
-
 from ecs.models import Component, System
-from ecs.exceptions import NonexistentComponentTypeForEntity
+
+from pytanks.position import Movement
+from pytanks import make_bullet
 
 class Weapon (Component):
     __slots__ = ("reload_time", "bullet", "till_reloaded", 
                 "bullet_dmg", "bullet_speed", "bullet_hp",
-                "bullet_texture", "bullet_hitbox")
+                "bullet_texture", "bullet_hitbox", "triggered")
 
     def __init__ (self, reload_time, bullet_dmg, bullet_speed, bullet_hp,
                         bullet_texture, bullet_hitbox):
@@ -20,3 +21,4 @@ class Weapon (Component):
         self.bullet_hp = bullet_hp
         self.bullet_texture = bullet_texture
         self.bullet_hitbox = bullet_hitbox
+        self.triggered = False

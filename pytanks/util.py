@@ -5,8 +5,8 @@ from pytanks.mount import Mount
 from pytanks.mountable import Mountable
 from pytanks.target import Hitbox, Health, HealthBar
 
-def make_color_surface (width, height, color, colorkey = (255, 255, 255)):
-    surface = pygame.Surface ( (width, height) )
+def make_color_surface (size, color, colorkey = (255, 255, 255)):
+    surface = pygame.Surface (size)
     surface.set_colorkey (colorkey)
     surface.fill (color)
     return surface
