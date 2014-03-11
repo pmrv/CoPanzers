@@ -26,17 +26,16 @@ def main (fps, w, h):
     system_manager.add_system (ExampleTurretSystem ())
     system_manager.add_system (CollisionSystem ())
 
-    make.barrier (entity_manager, 100, (0, 155, 0), (w / 4, 20), (w / 2, 100))
+    make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
     for i in range (3):
-        make.barrier (entity_manager, 10, (0, 155, 0), (20, 20), (50 + i * (w - 100)/2, 50))
+        make.example_barrier (entity_manager, 10, (20, 20), (50 + i * (w - 100)/2, 50))
 
-    # some dummy values so we can play with some bullets
-    fake_gun = Weapon (0, 2, 10, 4, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5))
+    make.example_turret (entity_manager, (w * .9, h * .9))
+    make.example_turret (entity_manager, (w * .1, h * .9))
+
+    dummy_bullet_props = (2, 10, 4, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5))
 
     """
-    things.append (ExampleTurret ((w * .9, h * .9)))
-    things.append (ExampleTurret ((w * .1, h * .9)))
-
     joy = pygame.joystick.Joystick (0)
     joy.init ()
     things.append (JoystickTank (joy, (0, h / 2)))
@@ -48,7 +47,7 @@ def main (fps, w, h):
 
         if frames % 50 == 0:
             for i in range (6):
-                make.bullet (entity_manager, fake_gun, (w / 2 - 18 + 6 * i, h * .9), (-2/3 + i/15) * math.pi)
+                make.bullet (entity_manager, dummy_bullet_props, (w / 2 - 18 + 6 * i, h * .9), (-2/3 + i/15) * math.pi)
 
         for e in pygame.event.get ():
             if e.type == QUIT: return

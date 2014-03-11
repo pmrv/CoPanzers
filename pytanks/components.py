@@ -94,10 +94,34 @@ class Mount (Component):
 
 
 class Position (Component):
+    # TODO: replace this and Movement with a real Vector Class some day
 
     __slots__ = "x", "y"
     def __init__ (self, x, y):
         self.x, self.y = x, y
+
+    def __str__ (self):
+        return "Position ({}, {})".format (self.x, self.y)
+
+    __repr__ = __str__
+
+    def __len__ (self): return 2
+
+    def __getitem__ (self, i):
+        if   i == 0:
+            return self.x
+        elif i == 1:
+            return self.y
+        else:
+            raise IndexError ("Index for Position must be in {0, 1}.")
+
+    def __setitem__ (self, i, v):
+        if   i == 0:
+            self.x = v
+        elif i == 1:
+            self.y = v
+        else:
+            raise IndexError ("Index for Position must be in {0, 1}.")
 
 
 class Movement (Component):
@@ -124,13 +148,15 @@ class Movement (Component):
 
 class Renderable (Component):
     __slots__ = ("texture",)
-    def __init__ (self, texture):
+    def __init__ (self, texture, layer = 0):
         """
         Note that entities that are Renderable also need at least the Position Component.
         texture -- pygame.Surface, image of what should be blitted
                    to the game screen
+        layer   -- int, entities with lower layer are drawn first, negative layers are legal
         """
         self.texture = texture
+        self.layer   = layer
 
 
 class Tags (Component, dict):
@@ -147,21 +173,21 @@ class ExampleTurret (Component):
 
 
 class Weapon (Component):
-    __slots__ = ("reload_time", "bullet", "till_reloaded", 
+    __slots__ = ("reload_time", "till_reloaded", 
                 "bullet_dmg", "bullet_speed", "bullet_hp",
                 "bullet_texture", "bullet_hitbox", "triggered")
 
-    def __init__ (self, reload_time, bullet_damage, bullet_speed, bullet_hp,
-                        bullet_texture, bullet_hitbox):
+    def __init__ (self, reload_time, bullet_properties):
         """
         reload_time -- float
-        bullet_*    -- values to init the bullet entity
+        bullet_properties -- 5 tuple of  
+                        0: int, damage,
+                        1: int, speed,
+                        2: int, hit points,
+                        3: pygame.Surface, texture
+                        4: 2 tuple of int, hitbox
         """
         self.till_reloaded = 0
         self.reload_time = reload_time
-        self.bullet_damage = bullet_damage
-        self.bullet_speed = bullet_speed
-        self.bullet_hp = bullet_hp
-        self.bullet_texture = bullet_texture
-        self.bullet_hitbox = bullet_hitbox
+        self.bullet_properties = bullet_properties
         self.triggered = False

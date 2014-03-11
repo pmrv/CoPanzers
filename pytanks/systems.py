@@ -17,21 +17,26 @@ class ExampleTurretSystem (System):
                 for c, tags in eman.pairs_for_type (Tags):
                     if tags ["Class"] == "Barrier":
                         turret.target = c
+                        print ("Turret {} found new target {}.".format (e, c))
                         break
+                else:
+                    print ("Ran out of targets.")
+                    continue # can't find new targets
 
-            weapon = eman.component_for_entity (e, Weapon)
-            if weapon.till_reloaded:
+            mount  = eman.component_for_entity (e, Mount)
+            weapon = eman.component_for_entity (mount.mounts [0], Weapon) 
+            if weapon.till_reloaded > 0:
                 continue
 
             target_pos = eman.component_for_entity (turret.target, Position)
             turret_pos = eman.component_for_entity (e, Position)
-            turret_mov = eman.component_for_entity (e, Movement)
+            weapon_mov = eman.component_for_entity (mount.mounts [0], Movement)
 
-            diff = target_pos [0] - turret_pos [0], target_pos [1] - turret_pos [1]
+            diff = target_pos.x - turret_pos.x, target_pos.y - turret_pos.y
 
-            turret_mov.rotation = math.cos (
+            weapon_mov.rotation = math.acos (
                 diff [0] / math.sqrt (diff [0] ** 2 + diff [1] ** 2)
-            )
+            ) 
             
             weapon.triggered = True
 
@@ -51,7 +56,9 @@ class RenderSystem (System):
         surf.fill ( (255, 255, 255) )
 
         eman = self.entity_manager
-        for e, renderable in eman.pairs_for_type (Renderable):
+        renders = list (eman.pairs_for_type (Renderable))
+        renders.sort (key = lambda x: x [1].layer)
+        for e, renderable in renders:
 
             pos = eman.component_for_entity (e, Position)
             text_rect = renderable.texture.get_rect ()
@@ -124,7 +131,7 @@ class MountSystem (System):
         for e, m in eman.pairs_for_type (Mount):
 
             try: 
-                pos = eman.compononent_for_enitity (e, Position)
+                pos = eman.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity:
                 print ("Weird, entity {} has no Position.".format (e))
                 continue
@@ -134,9 +141,9 @@ class MountSystem (System):
                 if im is None: continue
 
                 try: 
-                    ipos = eman.compononent_for_enitity (im, Position)
-                    ipos.x += pos.x + m.points [i] [0]
-                    ipos.y += pos.y + m.points [i] [1]
+                    ipos = eman.component_for_entity (im, Position)
+                    ipos.x = pos.x + m.points [i] [0]
+                    ipos.y = pos.y + m.points [i] [1]
 
                 except NonexistentComponentTypeForEntity:
                     print ("Weird, entity {} has no Position.".format (im))
@@ -150,7 +157,7 @@ class MovementSystem (System):
             try:
                 pos = self.entity_manager.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity:
-                print ("No position component found for moving.")
+                print ("No Position component found for moving.")
                 continue # shouldn't be happening, but just to be sure
 
             pos.x += vel.dx
@@ -160,7 +167,6 @@ class MovementSystem (System):
                 hitbox = self.entity_manager.component_for_entity (e, Hitbox)
                 hitbox.center = pos.x, pos.y
             except NonexistentComponentTypeForEntity:
-                print ("Entity has no hitbox, don't try to move it.")
                 continue
 
 
@@ -222,11 +228,11 @@ class WeaponSystem (System):
                 weapon.triggered = False
                 weapon.till_reloaded = weapon.reload_time
 
-                mov = eman.component_for_entity (e, Movement)
+                rot = eman.component_for_entity (e, Movement).rotation
                 pos = eman.component_for_entity (e, Position)
+                ign = (eman.component_for_entity (e, Mountable).root,)
 
-                rot = mov.rotation
-                make.bullet (eman, weapon, pos, rot)
+                make.bullet (eman, weapon.bullet_properties, pos, rot, ign)
             
             weapon.till_reloaded = max (0, weapon.till_reloaded - dt)
 
