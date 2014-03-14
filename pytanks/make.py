@@ -104,7 +104,7 @@ def example_weapon (eman, root, slot):
     pygame.draw.polygon (s, (150, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)))
     pygame.draw.polygon (s, (  0, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)), 1)
 
-    return weapon (eman, s, 1, (1, 80, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
+    return weapon (eman, s, .1, (5, 10, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
 
 def example_turret (eman, pos):
 

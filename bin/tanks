@@ -17,7 +17,7 @@ def main (fps, w, h):
     entity_manager = ecs.managers.EntityManager ()
     system_manager = ecs.managers.SystemManager (entity_manager)
 
-    system_manager.add_system (MovementSystem ())
+    system_manager.add_system (MovementSystem (w, h))
     system_manager.add_system (RenderSystem (surface))
     system_manager.add_system (HealthSystem ())
     system_manager.add_system (HealthRenderSystem (surface))
@@ -25,6 +25,7 @@ def main (fps, w, h):
     system_manager.add_system (MountSystem ())
     system_manager.add_system (ExampleTurretSystem ())
     system_manager.add_system (CollisionSystem ())
+    system_manager.add_system (DebugSystem ())
 
     make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
     for i in range (3):

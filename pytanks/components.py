@@ -145,6 +145,12 @@ class Movement (Component):
     def dy (self):
         return self.speed * math.sin (self.rotation)
 
+    
+    def __str__ (self):
+        return "Movement ({}, {})".format (self.rotation, self.speed)
+    
+    __repr__ = __str__
+
 
 class Renderable (Component):
     __slots__ = ("texture",)

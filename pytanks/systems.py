@@ -5,6 +5,15 @@ from pytanks.components import *
 from pytanks.util import components_for_entity
 from pytanks import make
 
+class DebugSystem (System):
+    """
+    Just used to print some debug values for me.
+    """
+
+    def update (self, _):
+        pass
+
+
 class ExampleTurretSystem (System):
 
     def update (self, dt):
@@ -20,15 +29,20 @@ class ExampleTurretSystem (System):
                         print ("Turret {} found new target {}.".format (e, c))
                         break
                 else:
-                    print ("Ran out of targets.")
                     continue # can't find new targets
+
+            try:
+                target_pos = eman.component_for_entity (turret.target, Position)
+            except NonexistentComponentTypeForEntity:
+                # target has no position, assume it no longer exists
+                turret.target = None
+                continue
 
             mount  = eman.component_for_entity (e, Mount)
             weapon = eman.component_for_entity (mount.mounts [0], Weapon) 
             if weapon.till_reloaded > 0:
                 continue
 
-            target_pos = eman.component_for_entity (turret.target, Position)
             turret_pos = eman.component_for_entity (e, Position)
             weapon_mov = eman.component_for_entity (mount.mounts [0], Movement)
 
@@ -61,9 +75,20 @@ class RenderSystem (System):
         for e, renderable in renders:
 
             pos = eman.component_for_entity (e, Position)
-            text_rect = renderable.texture.get_rect ()
+            try:
+                rot = eman.component_for_entity (e, Movement).rotation
+                if rot != 0:
+                    texture = pygame.transform.rotate (
+                        renderable.texture, math.degrees (rot)
+                    )
+                else:
+                    texture = renderable.texture
+            except NonexistentComponentTypeForEntity:
+                texture = renderable.texture
+
+            text_rect = texture.get_rect ()
             text_rect.center = pos.x, pos.y
-            surf.blit (renderable.texture, text_rect)
+            surf.blit (texture, text_rect)
 
 
 class HealthRenderSystem (RenderSystem):
@@ -152,7 +177,12 @@ class MountSystem (System):
 
 class MovementSystem (System):
 
+    def __init__ (self, width, height):
+        self.screen = pygame.Rect ( (0, 0, width, height) )
+        System.__init__ (self)
+
     def update (self, dt):
+        remove = []
         for e, vel in self.entity_manager.pairs_for_type (Movement):
             try:
                 pos = self.entity_manager.component_for_entity (e, Position)
@@ -163,11 +193,17 @@ class MovementSystem (System):
             pos.x += vel.dx
             pos.y += vel.dy
 
+            if not self.screen.collidepoint (pos):
+                remove.append (e) # remove all entities which disappear from the game screen
+
             try:
                 hitbox = self.entity_manager.component_for_entity (e, Hitbox)
                 hitbox.center = pos.x, pos.y
             except NonexistentComponentTypeForEntity:
                 continue
+
+        for e in remove:
+            self.entity_manager.remove_entity (e)
 
 
 class CollisionSystem (System):
@@ -232,7 +268,7 @@ class WeaponSystem (System):
                 pos = eman.component_for_entity (e, Position)
                 ign = (eman.component_for_entity (e, Mountable).root,)
 
-                make.bullet (eman, weapon.bullet_properties, pos, rot, ign)
+                make.bullet (eman, weapon.bullet_properties, pos, -rot, ign)
             
             weapon.till_reloaded = max (0, weapon.till_reloaded - dt)
 
