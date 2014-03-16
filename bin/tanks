@@ -11,8 +11,8 @@ from pytanks import make
 def main (fps, w, h):
 
     pygame.init ()
-    log.basicConfig (format = "%(levelname)s\n\t%(message)s", 
-            level = log.INFO)
+    log.basicConfig (format = "%(levelname)s %(name)s\n\t%(message)s\n", 
+            level = log.WARNING)
 
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
@@ -28,7 +28,6 @@ def main (fps, w, h):
     system_manager.add_system (MountSystem ())
     system_manager.add_system (ExampleTurretSystem ())
     system_manager.add_system (CollisionSystem ())
-    system_manager.add_system (DebugSystem ())
 
     make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
     for i in range (3):
