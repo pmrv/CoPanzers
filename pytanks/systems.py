@@ -1,3 +1,5 @@
+import logging
+
 from ecs.models import System
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
@@ -5,16 +7,13 @@ from pytanks.components import *
 from pytanks.util import components_for_entity
 from pytanks import make
 
-class DebugSystem (System):
-    """
-    Just used to print some debug values for me.
-    """
+class LogSystem (System):
 
-    def update (self, _):
-        pass
+    def __init__ (self):
+        self.log = logging.getLogger (__name__ + type (self).__name__)
+        System.__init__ (self)
 
-
-class ExampleTurretSystem (System):
+class ExampleTurretSystem (LogSystem):
 
     def update (self, dt):
 
@@ -26,7 +25,7 @@ class ExampleTurretSystem (System):
                 for c, tags in eman.pairs_for_type (Tags):
                     if tags ["Class"] == "Barrier":
                         turret.target = c
-                        print ("Turret {} found new target {}.".format (e, c))
+                        self.log.info ("Turret %s found new target %s.", e, c)
                         break
                 else:
                     continue # can't find new targets
@@ -35,6 +34,7 @@ class ExampleTurretSystem (System):
                 target_pos = eman.component_for_entity (turret.target, Position)
             except NonexistentComponentTypeForEntity:
                 # target has no position, assume it no longer exists
+                self.log.info ("Turret %s lost target %s.", e, turret.target) 
                 turret.target = None
                 continue
 
@@ -55,14 +55,14 @@ class ExampleTurretSystem (System):
             weapon.triggered = True
 
 
-class RenderSystem (System):
+class RenderSystem (LogSystem):
 
     def __init__ (self, surface, *args, **kw):
         """
         surface -- pygame.Surface, surface to draw to
         """
         self.surface = surface
-        System.__init__ (self, *args, **kw)
+        LogSystem.__init__ (self, *args, **kw)
 
     def update (self, _):
 
@@ -103,10 +103,10 @@ class HealthRenderSystem (RenderSystem):
                 pos    = eman.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity as err:
                 if   err.component_type == Health:
-                    print ("Weird, this entity has a HealthBar but \
-                            no Health: {}".format (e))
+                    self.log.warn ("%s has a HealthBar but no Health component.", e)
                 elif err.component_type == Position:
-                    print ("Weird, this entity has no Position: {}".format (e))
+                    self.log.warn ("%s has no Position component, can't draw its \
+                            health bar.", e)
                 continue 
 
             # TODO: make this cooler
@@ -134,21 +134,21 @@ class HealthRenderSystem (RenderSystem):
             pygame.draw.rect (self.surface, (255, 0, 0), (topleft_red, size_red))
 
 
-class HealthSystem (System):
+class HealthSystem (LogSystem):
 
     def update (self, _):
 
         destroyed = []
         for e, health in self.entity_manager.pairs_for_type (Health):
             if health.hp <= 0:
-                print ("Entity {} was destroyed.".format (e))
+                self.log.info ("%s was destroyed.", e)
                 destroyed.append (e)
 
         for e in destroyed:
             self.entity_manager.remove_entity (e)
 
 
-class MountSystem (System):
+class MountSystem (LogSystem):
 
     def update (self, dt):
 
@@ -158,7 +158,8 @@ class MountSystem (System):
             try: 
                 pos = eman.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity:
-                print ("Weird, entity {} has no Position.".format (e))
+                self.log.warn ("%s has a Mount but no Position component, \
+                        cannot adjust the position of the mounted entities.", e)
                 continue
 
             for i in range (m.amount):
@@ -171,15 +172,19 @@ class MountSystem (System):
                     ipos.y = pos.y + m.points [i] [1]
 
                 except NonexistentComponentTypeForEntity:
-                    print ("Weird, entity {} has no Position.".format (im))
+                    self.log.warn ("%s is mounted on %s, but has no Position \
+                            component, cannot adjust it.")
                     continue
 
 
-class MovementSystem (System):
+class MovementSystem (LogSystem):
 
     def __init__ (self, width, height):
+        """
+        width, height -- int, specify size of the visible screen
+        """
         self.screen = pygame.Rect ( (0, 0, width, height) )
-        System.__init__ (self)
+        LogSystem.__init__ (self)
 
     def update (self, dt):
         remove = []
@@ -187,13 +192,16 @@ class MovementSystem (System):
             try:
                 pos = self.entity_manager.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity:
-                print ("No Position component found for moving.")
-                continue # shouldn't be happening, but just to be sure
+                self.log.warn ("%s has a Movement but no Position component, \
+                        cannot move it.", e)
+                continue 
 
             pos.x += vel.dx
             pos.y += vel.dy
 
             if not self.screen.collidepoint (pos):
+                self.log.debug ("%s left the visible screen at %s, removing it.",
+                        e, pos)
                 remove.append (e) # remove all entities which disappear from the game screen
 
             try:
@@ -206,7 +214,7 @@ class MovementSystem (System):
             self.entity_manager.remove_entity (e)
 
 
-class CollisionSystem (System):
+class CollisionSystem (LogSystem):
 
     def update (self, dt):
         # for now just do collision detection for Projectiles
@@ -219,9 +227,8 @@ class CollisionSystem (System):
                 ehit, epos = components_for_entity (eman, e, (Hitbox, Position))
                 ehit.center = epos.x, epos.y
             except NonexistentComponentTypeForEntity:
-                print ("Entity {} has either no Hitbox or no Position \
-                        but Projectile, can't do collision detection  \
-                        with it.".format (e))
+                self.log.warn ("Skipping projectile %s for collision detection as \
+                        it has either no Position or Hitbox component.", e)
                 continue
 
             for o, ohit in eman.pairs_for_type (Hitbox):
@@ -230,30 +237,32 @@ class CollisionSystem (System):
                 try:
                     opos = eman.component_for_entity (o, Position)
                 except:
-                    print ("Entity {} has no Position but Hitbox, \
-                            can't to collision detection with it.".format (o))
+                    self.log.debug ("Skipping %s for collision dectection as it \
+                            has no Hitbox component.", o)
                     continue
 
                 ohit.center = opos.x, opos.y
 
                 # TODO: we should use pygame.Rect.collidelistall for this one
-                if not ehit.colliderect (ohit):
-                    continue
+                if ehit.colliderect (ohit):
 
-                destroyed.append (e)
+                    self.log.debug ("Projectile %s hit %s.", e, o)
+                    destroyed.append (e)
 
-                try:
-                    ohealth = eman.component_for_entity (o, Health)
-                    ohealth.hp -= proj.damage
-                except NonexistentComponentTypeForEntity:
-                    print ("Entity {} was hit but has no Health.".format (o))
-                    continue
+                    try:
+                        ohealth = eman.component_for_entity (o, Health)
+                        ohealth.hp -= proj.damage
+                    except NonexistentComponentTypeForEntity:
+                        self.log.info ("%s was hit but has no Health component, \
+                                so it took no damage.", o)
+
+                    break
 
         for e in destroyed:
             eman.remove_entity (e)
 
 
-class WeaponSystem (System):
+class WeaponSystem (LogSystem):
 
     def update (self, dt):
 
@@ -268,6 +277,8 @@ class WeaponSystem (System):
                 pos = eman.component_for_entity (e, Position)
                 ign = (eman.component_for_entity (e, Mountable).root,)
 
+                self.log.debug ("Weapon %s fired bullet from %s with angle %i°.",
+                        e, pos, math.degrees (-rot))
                 make.bullet (eman, weapon.bullet_properties, pos, -rot, ign)
             
             weapon.till_reloaded = max (0, weapon.till_reloaded - dt)

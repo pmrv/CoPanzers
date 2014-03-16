@@ -101,7 +101,8 @@ class Position (Component):
         self.x, self.y = x, y
 
     def __str__ (self):
-        return "Position ({}, {})".format (self.x, self.y)
+        # casting to int here since the x/y values specify pixels anyway
+        return "Position ({}, {})".format (int (self.x), int (self.y))
 
     __repr__ = __str__
 
@@ -147,7 +148,8 @@ class Movement (Component):
 
     
     def __str__ (self):
-        return "Movement ({}, {})".format (self.rotation, self.speed)
+        return "Movement ({}, {})".format (round (math.degrees (self.rotation), 2),
+                round (self.speed, 2))
     
     __repr__ = __str__
 
