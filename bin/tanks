@@ -12,7 +12,7 @@ def main (fps, w, h):
 
     pygame.init ()
     log.basicConfig (format = "%(levelname)s %(name)s\n\t%(message)s\n", 
-            level = log.WARNING)
+            level = log.INFO)
 
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
@@ -28,6 +28,7 @@ def main (fps, w, h):
     system_manager.add_system (MountSystem ())
     system_manager.add_system (ExampleTurretSystem ())
     system_manager.add_system (CollisionSystem ())
+    system_manager.add_system (ScriptSystem ())
 
     make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
     for i in range (3):
@@ -37,6 +38,8 @@ def main (fps, w, h):
     make.example_turret (entity_manager, (w * .1, h * .9))
 
     dummy_bullet_props = (2, 10, 4, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5))
+
+    make.example_scripted_tank (entity_manager, (w * .5, h * .5))
 
     """
     joy = pygame.joystick.Joystick (0)

@@ -1,6 +1,7 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
+from pytanks.scripts import example_routine, ScriptInterface
 from pytanks.components import *
 from pytanks.util import make_color_surface
 
@@ -123,3 +124,16 @@ def example_turret (eman, pos):
     eman.add_component (e, Tags (Class = "Turret"))
 
     return e
+
+def example_scripted_tank (eman, pos):
+
+    e = example_barrier (eman, 100, (40, 20), pos)
+    pos = eman.database [Position] [e]
+    mov = Movement (0, 0)
+    tag = eman.database [Tags] [e]
+    tag ["Class"] = "Tank"
+
+    eman.add_component (e, mov)
+    eman.add_component (e, 
+        Script (example_routine, ScriptInterface (pos, mov))
+    )

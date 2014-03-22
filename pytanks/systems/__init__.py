@@ -15,3 +15,4 @@ from .mountsystem         import MountSystem
 from .weaponsystem        import WeaponSystem
 from .collisionsystem     import CollisionSystem
 from .exampleturretsystem import ExampleTurretSystem
+from .scriptsystem        import ScriptSystem
