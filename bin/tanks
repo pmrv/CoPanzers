@@ -18,7 +18,8 @@ def main (fps, w, h):
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
 
-    entity_manager = EntityView ()
+    time = RefFloat (0)
+    entity_manager = EntityView (time)
     system_manager = ecs.managers.SystemManager (entity_manager)
 
     system_manager.add_system (MovementSystem (w, h))
@@ -42,7 +43,6 @@ def main (fps, w, h):
     make.example_scripted_tank (entity_manager, (w * .5, h * .5))
 
     frames = 0
-    time = RefFloat (0)
     dt = 1/fps
 
     while 1:

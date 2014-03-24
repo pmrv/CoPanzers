@@ -4,6 +4,7 @@ from functools import partial
 from ecs.managers import EntityManager
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
+from pytanks.util import RefFloat
 from pytanks.components import (Position, 
                                 Movement,
                                 Weapon,
@@ -154,7 +155,11 @@ class EntityView (EntityManager):
     subclasses ecs.managers.EntityManager for simplicity
     """
 
-    def __init__ (self):
+    def __init__ (self, time):
+        """
+        time -- pytanks.utils.RefFloat, tracks the total elapsed time
+        """
+        self.time = time
         super ().__init__ ()
         self.__interfaces = []
 
@@ -168,8 +173,8 @@ class EntityView (EntityManager):
         # ROInterface.__eq__
         for i in self.__interfaces:
             if i == e:
-                # so the interface knows to raise a DestroyedEntity exception
-                # the next time an attribute of it is called
+                # so scripts using this interface know the underlying interface
+                # was destroyed
                 i.destroyed = True
                 break
 
@@ -182,6 +187,18 @@ class EntityView (EntityManager):
     def __getitem__ (self, i):
         return self.__interfaces [i]
 
+def drive_circle (t, time, length, start = RefFloat (0)):
+    # the whole mess with $start is pretty quick and dirty
+    if start == 0:
+        start += abs (time)
+
+    if start + length <= time:
+        start -= abs (start)
+        return True
+
+    t.rotation = (time - start) * length / math.pi
+    return False
+
 def example_routine (tank, view):
 
     x, y = tank.position
@@ -190,11 +207,12 @@ def example_routine (tank, view):
     tw = t.mounts [0]
 
     tank.throttle = 1
+    yield partial (drive_circle, tank, view.time, 10)
+
     tank.rotation = - math.pi / 2
     yield (lambda: tank.position.y <= 50)
 
     tank.rotation = 0
-    tank.throttle = .5
     yield (lambda: tank.position.x >= 500)
 
     tank.rotation = math.pi / 2
@@ -207,6 +225,8 @@ def example_routine (tank, view):
     diff = y - tank.position.y
     tank.rotation = math.pi / 2 * diff / abs (diff)
     yield (lambda: abs (tank.position.y - y) <= 10)
+
+    yield partial (drive_circle, tank, view.time, 10)
 
     tank.throttle = 0
     tank.rotation = 0

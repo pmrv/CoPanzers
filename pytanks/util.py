@@ -37,9 +37,9 @@ def remove_entity (eman, e):
 @total_ordering
 class RefFloat:
     """ Mutable float. Only implements addition, since this appears to be
-    everything we nee. """
+    everything we need. """
     def __init__ (self, f):
-        self.__f = 0
+        self.__f = f
 
     def __eq__ (self, o):
         return self.__f.__eq__ (o)
@@ -48,10 +48,25 @@ class RefFloat:
         return self.__f.__lt__ (o)
 
     def __add__ (self, o):
-        return self.__f.__add__ (o)
+        if isinstance (o, RefFloat):
+            # this only works because self and o are of the same class
+            return self.__f.__add__ (o.__f)
+        else:
+            return self.__f.__add__ (o)
 
     def __sub__ (self, o):
-        return self.__f.__sub__ (o)
+        if isinstance (o, RefFloat):
+            # this only works because self and o are of the same class
+            return self.__f.__sub__ (o.__f)
+        else:
+            return self.__f.__sub__ (o)
+
+    def __radd__ (self, o):
+        return self.__f.__radd__ (o)
+
+    def __rsub__ (self, o):
+        return self.__f.__rsub__ (o)
+
 
     def __iadd__ (self, o):
         self.__f += o
@@ -66,3 +81,6 @@ class RefFloat:
 
     def __repr__ (self):
         return "RefInt({})".format (self.__f)
+
+    def __abs__ (self):
+        return self.__f
