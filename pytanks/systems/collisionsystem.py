@@ -4,7 +4,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 from pytanks.systems import LogSystem
 from pytanks.components import *
 
-from pytanks.util import components_for_entity
+from pytanks.util import components_for_entity, remove_entity
 
 class CollisionSystem (LogSystem):
 
@@ -51,4 +51,4 @@ class CollisionSystem (LogSystem):
                     break
 
         for e in destroyed:
-            eman.remove_entity (e)
+            remove_entity (eman, e)

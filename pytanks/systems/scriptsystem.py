@@ -16,7 +16,10 @@ class ScriptSystem (LogSystem):
                 except StopIteration: # routine finished
                     self.log.info ("Script routine for %s finished.", e)
                     finished.append (e)
+                except Exception as err:
+                    self.log.warning ("Script routine for %s failed with \"%s\".",
+                                      e, err)
+                    finished.append (e)
 
         for e in finished:
             eman.remove_component (e, Script)
-

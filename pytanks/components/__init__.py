@@ -8,6 +8,5 @@ from .healthbar import HealthBar
 from .mount import Mount
 from .mountable import Mountable
 from .projectile import Projectile
-from .exampleturret import ExampleTurret
 from .weapon import Weapon
 from .script import Script
