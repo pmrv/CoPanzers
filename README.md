@@ -26,28 +26,28 @@ path/script1.py path/script2.py …`.
 I'll just assume you know about python's function generators for now. The cool
 thing about generators is that they allow us to start/stop execution at almost
 arbitrary points in functions.  
-The only constraints on you script files are:
+The only constraints on you script files are:  
 1. they contain valid python (this is why you want to watch whose scripts you
-   run, nothing stops a script from running `shutil.rmtree ("~")`)
+   run, nothing stops a script from running `shutil.rmtree ("~")`)  
 2. they have a generator function called `main` which takes two arguments
-   (which I'll explain later)
+   (which I'll explain later)  
 3. they yield functions taking no arguments which return either `True` or
    `False`
 
-The general process followed by the game is this:
+The general process followed by the game is this:  
 1. it calls `main` with an object representing the tank your script controls
    and an iterator over all other objects in the game, thereby instantiating
-   the generator
+   the generator  
 2. each tick of the game the function last yielded by your generator is
    executed (`lambda: True` in the first tick), if it returns `True` execution in
-   your generator is resumed, if not the game will just retry in the next tick
+   your generator is resumed, if not the game will just retry in the next tick  
 3. your generator runs until you yield the next function, during that period
    the game does *nothing* else, i.e. *between* `yields` everything is static,
-   but also that malicious scripts can halt the whole game
-4. goto 2.
+   but also that malicious scripts can halt the whole game  
+4. goto 2.   
 
 So with that in mind let's look over
-[examples/demo_tank.py](examples/demo_tank.py) to get some of the details
+[examples/demo_tank.py](examples/demo_tank.py#L20) to get some of the details
 straight.
 
 * Line 20-22:
@@ -79,7 +79,7 @@ straight.
 * Line 42:
 
     Just something to ease debugging of your scripts, check
-    [this](pytanks/scripts.py#L15) if you're familiar with python `logging`
+    [this](pytanks/pytanks/scripts.py#L15) if you're familiar with python `logging`
     module.
 
 * Line 44:
@@ -96,7 +96,7 @@ straight.
     so much time on that.
 
 You will notice that the tank also has a weapon and we will see in 
-[examples/demo_turret.py](examples/demo_turret.py) how to use it. I will also 
+[examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also 
 explain a bit more about the second argument the generator function is call with.
 
 * Line 13:
@@ -106,12 +106,12 @@ explain a bit more about the second argument the generator function is call with
     that may change in the future). The weapon has a very similar interface to
     the one of your tank, but obviously some attributes will be different or
     not existent (I may or may not provide full or incomplete documentation on
-    interfaces later™). Examples of attributes are:
-    * .position: as the weapon may not be mounted in center of your tank
-    * .rotation: in which direction you're pointing the thing
-    * .reload_time: the time it takes to reload the weapon
-    * .till_reloaded: the time until you can fire the next time
-    * .shoot (): 
+    interfaces later™). Examples of attributes are:  
+    * .position: as the weapon may not be mounted in center of your tank  
+    * .rotation: in which direction you're pointing the thing  
+    * .reload_time: the time it takes to reload the weapon  
+    * .till_reloaded: the time until you can fire the next time  
+    * .shoot ():  
 
         this one's a method and will fire the weapon if possible,
         note that as 'time is frozen' when your generator is running, calling
@@ -120,14 +120,14 @@ explain a bit more about the second argument the generator function is call with
 
 * Line 15:
 
-    This is line has to important points:
+    This is line has to important points:  
     1. the second parameter `view` is an iterator over *all* entities in the
        game (including the your tank) represented by similar interfaces as your
-       tank or your weapon, but in a read-only fashion (again, full docs later)
+       tank or your weapon, but in a read-only fashion (again, full docs later)  
     2. the interfaces act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between
        barriers, tanks, turret or bullets; if an entity is not tagged with a
-       certain key it will raise a KeyError just like an ordinary dictionary
+       certain key it will raise a KeyError just like an ordinary dictionary  
 
 The rest of the loop is pretty similiar to the first demo, so this will have to
 be enough for now.
