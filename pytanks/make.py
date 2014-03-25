@@ -1,6 +1,7 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
+from pytanks.scripts import RWInterface
 from pytanks.components import *
 from pytanks.util import make_color_surface
 
@@ -18,8 +19,12 @@ def healthbar (pos, size):
 def bullet (eman, properties, pos, rot, ignore = tuple ()):
     """
     eman       -- ecs.managers.EntityManager, where to add the bullet to
-    properties -- 5 tuple, see pytanks.components.Weapon for a detailed 
-                         description
+    properties -- 5 tuple of  
+                    0: int, damage,
+                    1: int, speed,
+                    2: int, hit points,
+                    3: pygame.Surface, texture
+                    4: 2 tuple of int, hitbox
     pos        -- 2 tuple of int, position of the new bullet
     rot        -- float, in which direction the bullet should be fired
     """
@@ -83,7 +88,7 @@ def weapon (eman, texture, reload_time, bullet_properties, root, slot):
     m.mounts [slot] = e
 
     eman.add_component (e, Position (0, 0)) # Position is later set by the MountSystem
-    eman.add_component (e, Movement (0, 0))
+    eman.add_component (e, Movement (0, 0, 0))
     eman.add_component (e, Renderable (texture, 1))
     eman.add_component (e, Mountable (root))
     eman.add_component (e, Weapon (reload_time, bullet_properties))
@@ -104,9 +109,9 @@ def example_weapon (eman, root, slot):
     pygame.draw.polygon (s, (150, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)))
     pygame.draw.polygon (s, (  0, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)), 1)
 
-    return weapon (eman, s, .1, (5, 10, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
+    return weapon (eman, s, .8, (5, 80, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
 
-def example_turret (eman, pos):
+def scripted_turret (eman, routine, pos):
 
     h, w = 30, 30
     s = pygame.Surface ((h, w))
@@ -118,8 +123,24 @@ def example_turret (eman, pos):
     e = barrier (eman, 80, s, (h, w), pos)
 
     eman.add_component (e, Mount (((0,0),)))
-    eman.add_component (e, ExampleTurret ())
     example_weapon (eman, e, 0)
+    eman.add_component (e, 
+            Script (routine (RWInterface (e, eman), eman)))
     eman.add_component (e, Tags (Class = "Turret"))
 
     return e
+
+def scripted_tank (eman, routine, pos):
+
+    e = example_barrier (eman, 100, (60, 20), pos)
+    pos = eman.database [Position] [e]
+    mov = Movement (0, 0, 70)
+    tag = eman.database [Tags] [e]
+    tag ["Class"] = "Tank"
+
+    eman.add_component (e, mov)
+    eman.add_component (e, Mount ( ((0, 0),) ))
+    example_weapon (eman, e, 0)
+    eman.add_component (e, 
+        Script (routine (RWInterface (e, eman), eman))
+    )

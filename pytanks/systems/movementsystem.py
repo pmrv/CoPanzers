@@ -4,6 +4,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from pytanks.systems import LogSystem
 from pytanks.components import *
+from pytanks.util import remove_entity
 
 class MovementSystem (LogSystem):
 
@@ -24,8 +25,8 @@ class MovementSystem (LogSystem):
                         cannot move it.", e)
                 continue 
 
-            pos.x += vel.dx
-            pos.y += vel.dy
+            pos.x += vel.dx * dt
+            pos.y += vel.dy * dt
 
             if not self.screen.collidepoint (pos):
                 self.log.debug ("%s left the visible screen at %s, removing it.",
@@ -39,4 +40,4 @@ class MovementSystem (LogSystem):
                 continue
 
         for e in remove:
-            self.entity_manager.remove_entity (e)
+            remove_entity (self.entity_manager,e)

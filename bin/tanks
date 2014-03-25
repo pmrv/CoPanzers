@@ -1,23 +1,69 @@
 #!/usr/bin/env python3
 
+import argparse
 import logging as log
 import pygame, math, ecs
 from pygame.locals import *
 
 from pytanks.systems import *
-from pytanks.util import make_color_surface
+from pytanks.util import make_color_surface, RefFloat
 from pytanks import make
+from pytanks.scripts import EntityView
+
+def load_routine (script):
+
+    with open (script) as f:
+        l = {}
+        routine = exec (f.read (), l)
+        return l ["main"]
+
+def init_demo (entity_manager, w, h, _):
+    # we don't need the args instance in here yet and just add that paramater
+    # to make the function signatures equal
+
+    make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
+    for i in range (3):
+        make.example_barrier (entity_manager, 20, (20, 20), (50 + i * (w - 100)/2, 50))
+
+    make.scripted_turret (entity_manager, load_routine ("examples/demo_turret.py"), (w * .9, h * .9))
+    make.scripted_turret (entity_manager, load_routine ("examples/demo_turret.py"), (w * .1, h * .9))
+
+    make.scripted_tank (entity_manager, load_routine ("examples/demo_tank.py"), (w * .5, h * .5))
+
+def init_match (entity_manager, w, h, args):
+
+    n = len (args.scripts)
+    offset = 20
+    
+    for i in range (n):
+        make.scripted_tank (
+                entity_manager, 
+                load_routine (args.scripts [i]), 
+                # ahaha inline ifs!
+                (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
+        )
 
 def main (fps, w, h):
 
+    parser = argparse.ArgumentParser (prog = "tanks")
+    subs = parser.add_subparsers ()
+    demo_parser = subs.add_parser ("demo")
+    demo_parser.set_defaults (init = init_demo)
+    match_parser = subs.add_parser ("match")
+    match_parser.add_argument ("scripts", nargs = "+",
+            help = "Paths to script files that should battle each other.")
+    match_parser.set_defaults (init = init_match)
+    args = parser.parse_args ()
+
     pygame.init ()
     log.basicConfig (format = "%(levelname)s %(name)s\n\t%(message)s\n", 
-            level = log.WARNING)
+            level = log.INFO)
 
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
 
-    entity_manager = ecs.managers.EntityManager ()
+    time = RefFloat (0)
+    entity_manager = EntityView (time)
     system_manager = ecs.managers.SystemManager (entity_manager)
 
     system_manager.add_system (MovementSystem (w, h))
@@ -26,39 +72,24 @@ def main (fps, w, h):
     system_manager.add_system (HealthRenderSystem (surface))
     system_manager.add_system (WeaponSystem ())
     system_manager.add_system (MountSystem ())
-    system_manager.add_system (ExampleTurretSystem ())
     system_manager.add_system (CollisionSystem ())
+    system_manager.add_system (ScriptSystem ())
 
-    make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
-    for i in range (3):
-        make.example_barrier (entity_manager, 10, (20, 20), (50 + i * (w - 100)/2, 50))
-
-    make.example_turret (entity_manager, (w * .9, h * .9))
-    make.example_turret (entity_manager, (w * .1, h * .9))
-
-    dummy_bullet_props = (2, 10, 4, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5))
-
-    """
-    joy = pygame.joystick.Joystick (0)
-    joy.init ()
-    things.append (JoystickTank (joy, (0, h / 2)))
-    """
-
+    args.init (entity_manager, w, h, args)
+    
     frames = 0
+    dt = 1/fps
 
     while 1:
-
-        if frames % 50 == 0:
-            for i in range (6):
-                make.bullet (entity_manager, dummy_bullet_props, (w / 2 - 18 + 6 * i, h * .9), (-2/3 + i/15) * math.pi)
 
         for e in pygame.event.get ():
             if e.type == QUIT: return
 
-        system_manager.update (1 / fps)
+        system_manager.update (dt)
         pygame.display.update ()
         clock.tick (fps)
         frames += 1
+        time += dt
 
 if __name__ == "__main__":
     main (30, 640, 340)

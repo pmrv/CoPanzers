@@ -4,6 +4,8 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 from pytanks.systems import LogSystem
 from pytanks.components import *
 
+from pytanks.util import remove_entity
+
 class HealthSystem (LogSystem):
 
     def update (self, _):
@@ -15,4 +17,4 @@ class HealthSystem (LogSystem):
                 destroyed.append (e)
 
         for e in destroyed:
-            self.entity_manager.remove_entity (e)
+            remove_entity (self.entity_manager,e)

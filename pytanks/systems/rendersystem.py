@@ -29,7 +29,7 @@ class RenderSystem (LogSystem):
                 rot = eman.component_for_entity (e, Movement).rotation
                 if rot != 0:
                     texture = pygame.transform.rotate (
-                        renderable.texture, math.degrees (rot)
+                        renderable.texture, math.degrees (-rot)
                     )
                 else:
                     texture = renderable.texture
