@@ -4,7 +4,7 @@
 
 
 # PyTanks (name change pending)
-Attempt at a (programmable) shot'em up game based on an entity-component-system,
+Attempt at a (programmable) shoot'em up game based on an entity-component-system,
 requires Python3, [pygame][] and [ecs][].
 
 ## Running
