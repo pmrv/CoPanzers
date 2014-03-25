@@ -1,4 +1,4 @@
-
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import pygame
 from ecs.models import Component
 

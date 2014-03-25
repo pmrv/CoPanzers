@@ -1,3 +1,4 @@
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import logging
 from ecs.models import System
 

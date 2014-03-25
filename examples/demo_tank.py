@@ -1,3 +1,4 @@
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import math
 from functools import partial
 

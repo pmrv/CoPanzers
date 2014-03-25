@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import argparse
 import logging as log
 import pygame, math, ecs

@@ -1,3 +1,4 @@
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from .tags import Tags
 from .position import Position
 from .movement import Movement

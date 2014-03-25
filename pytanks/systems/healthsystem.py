@@ -1,4 +1,4 @@
-
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from pytanks.systems import LogSystem

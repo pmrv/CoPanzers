@@ -1,3 +1,4 @@
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from functools import total_ordering
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity

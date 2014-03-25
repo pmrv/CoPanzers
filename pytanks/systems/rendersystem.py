@@ -1,4 +1,4 @@
-
+# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import pygame, math
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
