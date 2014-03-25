@@ -27,7 +27,7 @@ def remove_entity (eman, e):
     remove an entity and all mounted entities from the entity manager
     """
     try:
-        for m in eman.component_for_entity (e, Mount):
+        for m in eman.component_for_entity (e, Mount).mounts:
             eman.remove_entity (m)
     except NonexistentComponentTypeForEntity:
         pass

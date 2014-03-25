@@ -33,7 +33,7 @@ def init_demo (entity_manager, w, h, _):
 def init_match (entity_manager, w, h, args):
 
     n = len (args.scripts)
-    offset = 20
+    offset = 100
     
     for i in range (n):
         make.scripted_tank (
