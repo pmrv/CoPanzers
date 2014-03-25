@@ -1,9 +1,7 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.scripts import (RWInterface, 
-                            example_routine, 
-                            example_turret_routine)
+from pytanks.scripts import RWInterface
 from pytanks.components import *
 from pytanks.util import make_color_surface
 
@@ -113,7 +111,7 @@ def example_weapon (eman, root, slot):
 
     return weapon (eman, s, .8, (5, 80, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
 
-def example_turret (eman, pos):
+def scripted_turret (eman, routine, pos):
 
     h, w = 30, 30
     s = pygame.Surface ((h, w))
@@ -127,12 +125,12 @@ def example_turret (eman, pos):
     eman.add_component (e, Mount (((0,0),)))
     example_weapon (eman, e, 0)
     eman.add_component (e, 
-            Script (example_turret_routine (RWInterface (e, eman), eman)))
+            Script (routine (RWInterface (e, eman), eman)))
     eman.add_component (e, Tags (Class = "Turret"))
 
     return e
 
-def example_scripted_tank (eman, pos):
+def scripted_tank (eman, routine, pos):
 
     e = example_barrier (eman, 100, (60, 20), pos)
     pos = eman.database [Position] [e]
@@ -141,6 +139,8 @@ def example_scripted_tank (eman, pos):
     tag ["Class"] = "Tank"
 
     eman.add_component (e, mov)
+    eman.add_component (e, Mount ( ((0, 0),) ))
+    example_weapon (eman, e, 0)
     eman.add_component (e, 
-        Script (example_routine (RWInterface (e, eman), eman))
+        Script (routine (RWInterface (e, eman), eman))
     )
