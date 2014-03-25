@@ -79,7 +79,7 @@ straight.
 * Line 42:
 
     Just something to ease debugging of your scripts, check
-    [this](pytanks/pytanks/scripts.py#L15) if you're familiar with python `logging`
+    [this](pytanks/scripts.py#L15) if you're familiar with python `logging`
     module.
 
 * Line 44:
@@ -87,7 +87,7 @@ straight.
     It's getting a bit complicated here to show that the function we return
     don't have to be without side effects, but are actually a pretty good place
     to do some periodic stuff as it is called every tick of the game. Note that
-    you don't have to use partial function application to pull this of, you can
+    you don't have to use partial function application to pull this off, you can
     also use closures and nested function definitions to achieve the same, I
     just don't like it as much. You can also use sub-generators and the `yield from`
     syntax python provides. The `view.time` you see in there is a reference 
@@ -127,7 +127,7 @@ explain a bit more about the second argument the generator function is call with
     2. the interfaces act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between
        barriers, tanks, turret or bullets; if an entity is not tagged with a
-       certain key it will raise a KeyError just like an ordinary dictionary  
+       certain key it will raise a `KeyError` just like an ordinary dictionary  
 
 The rest of the loop is pretty similiar to the first demo, so this will have to
 be enough for now.
