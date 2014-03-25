@@ -14,20 +14,14 @@ def drive_circle (t, time, length, start = RefFloat (0)):
         start -= abs (start)
         return True
 
-    t.rotation = (time - start) * length / math.pi
+    t.rotation = (time - start) / length * math.pi * 2
     return False
 
 def main (tank, view):
 
-    log = get_logger ("DemoTank")
-
     x, y = tank.position
 
     tank.throttle = 1
-    log.info ("Imma driving a circle!")
-    yield partial (drive_circle, tank, view.time, 10)
-    log.info ("Should I do it again?")
-
     tank.rotation = - math.pi / 2
     yield (lambda: tank.position.y <= 50)
 
@@ -45,7 +39,11 @@ def main (tank, view):
     tank.rotation = math.pi / 2 * diff / abs (diff)
     yield (lambda: abs (tank.position.y - y) <= 10)
 
-    yield partial (drive_circle, tank, view.time, 10)
+    log = get_logger ("DemoTank")
+    log.info ("Imma driving a circle!")
+    tank.throttle = .5
+    yield partial (drive_circle, tank, view.time, 2)
+    log.info ("Should I do it again?")
 
     tank.throttle = 0
     tank.rotation = 0

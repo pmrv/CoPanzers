@@ -58,7 +58,7 @@ def main (fps, w, h):
 
     pygame.init ()
     log.basicConfig (format = "%(levelname)s %(name)s\n\t%(message)s\n", 
-            level = log.INFO)
+            level = log.WARNING)
 
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()

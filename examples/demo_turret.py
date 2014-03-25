@@ -11,9 +11,8 @@ def main (turret, view):
 
     x, y = turret.position
     cannon = turret.mounts [0]
-
     
-    for b in list (filter (lambda x: x ["Class"] == "Barrier", view)):
+    for b in filter (lambda x: x ["Class"] == "Barrier", view):
         bx, by = b.position
         dx = bx - x
         dy = by - y
