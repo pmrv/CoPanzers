@@ -2,8 +2,8 @@
 import math
 from functools import partial
 
-from pytanks.util import RefFloat
-from pytanks.scripts import get_logger
+from copanzers.util import RefFloat
+from copanzers.scripts import get_logger
 
 def drive_circle (t, time, length, start = RefFloat (0)):
     # the whole mess with $start is pretty quick and dirty

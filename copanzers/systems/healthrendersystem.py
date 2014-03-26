@@ -2,8 +2,8 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.systems import LogSystem, RenderSystem
-from pytanks.components import *
+from copanzers.systems import LogSystem, RenderSystem
+from copanzers.components import *
 
 class HealthRenderSystem (RenderSystem):
 

@@ -2,9 +2,9 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.scripts import RWInterface
-from pytanks.components import *
-from pytanks.util import make_color_surface
+from copanzers.scripts import RWInterface
+from copanzers.components import *
+from copanzers.util import make_color_surface
 
 ## defaults for components
 def healthbar (pos, size):

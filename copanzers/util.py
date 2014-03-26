@@ -3,7 +3,7 @@ from functools import total_ordering
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.components import Mount
+from copanzers.components import Mount
 
 def make_color_surface (size, color, colorkey = (255, 255, 255)):
     surface = pygame.Surface (size)

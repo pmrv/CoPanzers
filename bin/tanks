@@ -6,10 +6,10 @@ import logging as log
 import pygame, math, ecs
 from pygame.locals import *
 
-from pytanks.systems import *
-from pytanks.util import make_color_surface, RefFloat
-from pytanks import make
-from pytanks.scripts import EntityView
+from copanzers.systems import *
+from copanzers.util import make_color_surface, RefFloat
+from copanzers import make
+from copanzers.scripts import EntityView
 
 def load_routine (script):
 

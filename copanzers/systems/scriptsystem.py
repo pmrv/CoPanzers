@@ -1,6 +1,6 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
-from pytanks.systems import LogSystem
-from pytanks.components import Script
+from copanzers.systems import LogSystem
+from copanzers.components import Script
 
 class ScriptSystem (LogSystem):
 

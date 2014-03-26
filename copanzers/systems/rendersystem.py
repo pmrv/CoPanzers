@@ -2,8 +2,8 @@
 import pygame, math
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.systems import LogSystem
-from pytanks.components import *
+from copanzers.systems import LogSystem
+from copanzers.components import *
 
 class RenderSystem (LogSystem):
 

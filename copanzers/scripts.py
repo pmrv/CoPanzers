@@ -4,8 +4,8 @@ from functools import partial
 from ecs.managers import EntityManager
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.util import RefFloat
-from pytanks.components import (Position, 
+from copanzers.util import RefFloat
+from copanzers.components import (Position, 
                                 Movement,
                                 Weapon,
                                 Health,
@@ -266,7 +266,7 @@ class EntityView (EntityManager):
 
     def __init__ (self, time):
         """
-        time -- pytanks.utils.RefFloat, tracks the total elapsed time
+        time -- copanzers.utils.RefFloat, tracks the total elapsed time
         """
         self.time = time
         super ().__init__ ()

@@ -6,7 +6,7 @@ class LogSystem (System):
 
     def __init__ (self):
         self.log = logging.getLogger (__name__ + "." + type (self).__name__)
-        System.__init__ (self)
+        super ().__init__ ()
 
 from .movementsystem      import MovementSystem
 from .healthsystem        import HealthSystem

@@ -3,7 +3,7 @@
 [pygame]: http://pygame.org/download.shtml "Pygame"
 
 
-# PyTanks (name change pending)
+# CoPanzers - Script Dem Panzers
 Attempt at a (programmable) shoot'em up game based on an entity-component-system,
 requires Python3, [pygame][] and [ecs][].
 

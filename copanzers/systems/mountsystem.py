@@ -1,8 +1,8 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.systems import LogSystem
-from pytanks.components import *
+from copanzers.systems import LogSystem
+from copanzers.components import *
 
 class MountSystem (LogSystem):
 

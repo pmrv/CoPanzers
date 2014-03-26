@@ -2,9 +2,9 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from pytanks.systems import LogSystem
-from pytanks.components import *
-from pytanks.util import remove_entity
+from copanzers.systems import LogSystem
+from copanzers.components import *
+from copanzers.util import remove_entity
 
 class MovementSystem (LogSystem):
 
@@ -13,7 +13,7 @@ class MovementSystem (LogSystem):
         width, height -- int, specify size of the visible screen
         """
         self.screen = pygame.Rect ( (0, 0, width, height) )
-        LogSystem.__init__ (self)
+        super ().__init__ ()
 
     def update (self, dt):
         remove = []
