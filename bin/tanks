@@ -9,7 +9,6 @@ from pygame.locals import *
 from copanzers.systems import *
 from copanzers.util import make_color_surface, RefFloat
 from copanzers import make
-from copanzers.scripts import EntityView
 
 def load_routine (script):
 
@@ -18,7 +17,7 @@ def load_routine (script):
         routine = exec (f.read (), l)
         return l ["main"]
 
-def init_demo (entity_manager, w, h, _):
+def init_demo (entity_manager, w, h, time, _):
     # we don't need the args instance in here yet and just add that paramater
     # to make the function signatures equal
 
@@ -26,12 +25,18 @@ def init_demo (entity_manager, w, h, _):
     for i in range (3):
         make.example_barrier (entity_manager, 20, (20, 20), (50 + i * (w - 100)/2, 50))
 
-    make.scripted_turret (entity_manager, load_routine ("examples/demo_turret.py"), (w * .9, h * .9))
-    make.scripted_turret (entity_manager, load_routine ("examples/demo_turret.py"), (w * .1, h * .9))
+    make.scripted_turret (entity_manager, 
+            load_routine ("examples/demo_turret.py"), 
+            time, (w * .9, h * .9))
+    make.scripted_turret (entity_manager, 
+            load_routine ("examples/demo_turret.py"), 
+            time, (w * .1, h * .9))
 
-    make.scripted_tank (entity_manager, load_routine ("examples/demo_tank.py"), (w * .5, h * .5))
+    make.scripted_tank (entity_manager, 
+            load_routine ("examples/demo_tank.py"), 
+            time, (w * .5, h * .5))
 
-def init_match (entity_manager, w, h, args):
+def init_match (entity_manager, w, h, time, args):
 
     n = len (args.scripts)
     offset = 100
@@ -40,6 +45,7 @@ def init_match (entity_manager, w, h, args):
         make.scripted_tank (
                 entity_manager, 
                 load_routine (args.scripts [i]), 
+                time,
                 # ahaha inline ifs!
                 (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
         )
@@ -63,8 +69,7 @@ def main (fps, w, h):
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
 
-    time = RefFloat (0)
-    entity_manager = EntityView (time)
+    entity_manager = ecs.managers.EntityManager ()
     system_manager = ecs.managers.SystemManager (entity_manager)
 
     system_manager.add_system (MovementSystem (w, h))
@@ -74,9 +79,11 @@ def main (fps, w, h):
     system_manager.add_system (WeaponSystem ())
     system_manager.add_system (MountSystem ())
     system_manager.add_system (CollisionSystem ())
+    system_manager.add_system (VisionSystem ())
     system_manager.add_system (ScriptSystem ())
 
-    args.init (entity_manager, w, h, args)
+    time = RefFloat (0)
+    args.init (entity_manager, w, h, time, args)
     
     frames = 0
     dt = 1/fps

@@ -7,12 +7,12 @@ def destroy_target (w, target):
         w.shoot ()
     return target.destroyed
 
-def main (turret, view):
+def main (turret, time):
 
     x, y = turret.position
     cannon = turret.mounts [0]
     
-    for b in filter (lambda x: x ["Class"] == "Barrier", view):
+    for b in filter (lambda x: x ["Class"] == "Barrier", turret.visible):
         bx, by = b.position
         dx, dy = bx - x, by - y
         if dy == 0:

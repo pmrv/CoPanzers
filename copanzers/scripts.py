@@ -6,9 +6,11 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from copanzers.util import RefFloat
 from copanzers.components import (Position, 
+                                Destroyed,
                                 Movement,
                                 Weapon,
                                 Health,
+                                Vision,
                                 Mount,
                                 Tags)
 
@@ -50,9 +52,6 @@ class ROInterface:
         self.e = entity
         self.eman = entity_manager
         self.__throttle = 0
-        # whether the interface refers to an destroyed entity (so you know when
-        # you can stop shooting
-        self.destroyed = False 
 
     def __eq__ (self, other):
         if hasattr (other, "e"):
@@ -66,6 +65,13 @@ class ROInterface:
             return self.eman.component_for_entity (self.e, Tags) [i]
         except NonexistentComponentTypeForEntity:
             raise KeyError (i)
+
+    @property
+    @unsure
+    # not exactly happy with that, maybe unsure should just raise an error or
+    # something
+    def destroyed (self):
+        return Destroyed in self.eman.database and self.e in self.eman.database [Destroyed]
 
     @property
     @unsure
@@ -256,39 +262,13 @@ class RWInterface (ROInterface):
                 Weapon
         ).bullet_properties [3]
 
-
-class EntityView (EntityManager):
-    """
-    represents all entities in the game in a manner the script routines 
-    can handle comfortably
-    subclasses ecs.managers.EntityManager for simplicity
-    """
-
-    def __init__ (self, time):
+    @property
+    @unsure
+    def visible (self):
         """
-        time -- copanzers.utils.RefFloat, tracks the total elapsed time
+        Return all entities that are plainly visible.
         """
-        self.time = time
-        super ().__init__ ()
-        self.__interfaces = []
-
-    def create_entity (self):
-        e = super ().create_entity ()
-        self.__interfaces.append (ROInterface (e, self))
-        return e
-
-    def remove_entity (self, e):
-        # that's why we compare directly to the given element in
-        # ROInterface.__eq__
-        for i in self.__interfaces:
-            if i == e:
-                # so scripts using this interface know the underlying interface
-                # was destroyed
-                i.destroyed = True
-                break
-
-        self.__interfaces.remove (e) 
-        super ().remove_entity (e)
-
-    def __iter__ (self):
-        return iter (copy (self.__interfaces))
+        return self.eman.component_for_entity (
+                self.e,
+                Vision
+        ).visible

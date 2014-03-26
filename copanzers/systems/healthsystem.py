@@ -4,7 +4,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 from copanzers.systems import LogSystem
 from copanzers.components import *
 
-from copanzers.util import remove_entity
+from copanzers.util import destroy_entity
 
 class HealthSystem (LogSystem):
 
@@ -17,4 +17,4 @@ class HealthSystem (LogSystem):
                 destroyed.append (e)
 
         for e in destroyed:
-            remove_entity (self.entity_manager,e)
+            destroy_entity (self.entity_manager, e)

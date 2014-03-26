@@ -3,7 +3,7 @@ from functools import total_ordering
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.components import Mount
+from copanzers.components import Mount, Destroyed, Tags
 
 def make_color_surface (size, color, colorkey = (255, 255, 255)):
     surface = pygame.Surface (size)
@@ -23,17 +23,23 @@ def components_for_entity (eman, entity, components):
 
     return tuple (eman.component_for_entity (entity, c) for c in components)
 
-def remove_entity (eman, e):
+def destroy_entity (eman, e):
     """
     remove an entity and all mounted entities from the entity manager
     """
     try:
         for m in eman.component_for_entity (e, Mount).mounts:
-            eman.remove_entity (m)
+            destroy_entity (eman, e)
     except NonexistentComponentTypeForEntity:
         pass
     finally:
+        t = eman.component_for_entity (e, Tags)
         eman.remove_entity (e)
+        eman.add_component (e, Destroyed ())
+        # add the tags back just in case a script routine is iterating over
+        # its visible entities right now and queries their tags, kind of an
+        # ugly hack
+        eman.add_component (e, t) 
 
 @total_ordering
 class RefFloat:
@@ -81,7 +87,7 @@ class RefFloat:
         return str (self.__f)
 
     def __repr__ (self):
-        return "RefInt({})".format (self.__f)
+        return "RefFloat({})".format (self.__f)
 
     def __abs__ (self):
         return self.__f

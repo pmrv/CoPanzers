@@ -4,7 +4,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 from copanzers.systems import LogSystem
 from copanzers.components import *
 
-from copanzers.util import components_for_entity, remove_entity
+from copanzers.util import components_for_entity, destroy_entity
 
 class CollisionSystem (LogSystem):
 
@@ -51,4 +51,4 @@ class CollisionSystem (LogSystem):
                     break
 
         for e in destroyed:
-            remove_entity (eman, e)
+            destroy_entity (eman, e)

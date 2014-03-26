@@ -112,7 +112,22 @@ def example_weapon (eman, root, slot):
 
     return weapon (eman, s, .8, (5, 80, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
 
-def scripted_turret (eman, routine, pos):
+def radar (eman, root, slot, reach):
+
+    m = eman.component_for_entity (root, Mount)
+    if slot >= m.amount or m.mounts [slot] != None:
+        raise ValueError ("Mount point {} already taken or not existent.".format (slot))
+
+    e = eman.create_entity ()
+    m.mounts [slot] = e
+
+    eman.add_component (e, Position (0, 0))
+    eman.add_component (e, Vision ("radar", reach))
+    eman.add_component (e, Tags (Class = "Radar"))
+
+    return e
+
+def scripted_turret (eman, routine, time, pos):
 
     h, w = 30, 30
     s = pygame.Surface ((h, w))
@@ -124,14 +139,15 @@ def scripted_turret (eman, routine, pos):
     e = barrier (eman, 80, s, (h, w), pos)
 
     eman.add_component (e, Mount (((0,0),)))
+    eman.add_component (e, Vision ("plain", 400))
     example_weapon (eman, e, 0)
     eman.add_component (e, 
-            Script (routine (RWInterface (e, eman), eman)))
+            Script (routine (RWInterface (e, eman), time)))
     eman.add_component (e, Tags (Class = "Turret"))
 
     return e
 
-def scripted_tank (eman, routine, pos):
+def scripted_tank (eman, routine, time, pos):
 
     e = example_barrier (eman, 100, (60, 20), pos)
     pos = eman.database [Position] [e]
@@ -140,8 +156,10 @@ def scripted_tank (eman, routine, pos):
     tag ["Class"] = "Tank"
 
     eman.add_component (e, mov)
-    eman.add_component (e, Mount ( ((0, 0),) ))
+    eman.add_component (e, Mount ( ((0, 0),(0, 0)) ))
+    eman.add_component (e, Vision ("plain", 600))
+    radar (eman, e, 1, 1200)
     example_weapon (eman, e, 0)
     eman.add_component (e, 
-        Script (routine (RWInterface (e, eman), eman))
+        Script (routine (RWInterface (e, eman), time))
     )

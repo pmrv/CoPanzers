@@ -4,7 +4,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from copanzers.systems import LogSystem
 from copanzers.components import *
-from copanzers.util import remove_entity
+from copanzers.util import destroy_entity
 
 class MovementSystem (LogSystem):
 
@@ -40,4 +40,4 @@ class MovementSystem (LogSystem):
                 continue
 
         for e in remove:
-            remove_entity (self.entity_manager,e)
+            destroy_entity (self.entity_manager,e)
