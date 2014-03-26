@@ -36,7 +36,7 @@ The only constraints on you script files are:
 
 The general process followed by the game is this:  
 1. it calls `main` with an object representing the tank your script controls
-   and an iterator over all other objects in the game, thereby instantiating
+   and a reference to the total elapsed time in the game, thereby instantiating
    the generator  
 2. each tick of the game the function last yielded by your generator is
    executed (`lambda: True` in the first tick), if it returns `True` execution in
@@ -90,10 +90,12 @@ straight.
     you don't have to use partial function application to pull this off, you can
     also use closures and nested function definitions to achieve the same, I
     just don't like it as much. You can also use sub-generators and the `yield from`
-    syntax python provides. The `view.time` you see in there is a reference 
+    syntax python provides. The `time` you see in there is a reference 
     to the total elapsed time in the course of the game, but it's one of the 
     more ugly parts and likely to change in the future, so I'd rather not spend 
-    so much time on that.
+    so much time on that. Just note that with `abs (time)` you can turn it into
+    a normal `float` and that its value will change monotonic as the game
+    progresses.
 
 You will notice that the tank also has a weapon and we will see in 
 [examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also 
@@ -121,13 +123,20 @@ explain a bit more about the second argument the generator function is call with
 * Line 15:
 
     This is line has to important points:  
-    1. the second parameter `view` is an iterator over *all* entities in the
+    1. the attribute `turret.visible` is an iterator over *all* entities in the
        game (including the your tank) represented by similar interfaces as your
        tank or your weapon, but in a read-only fashion (again, full docs later)  
     2. the interfaces act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between
        barriers, tanks, turret or bullets; if an entity is not tagged with a
        certain key it will raise a `KeyError` just like an ordinary dictionary  
+
+* Line 8:
+
+    Every interface we talked about so far also has a attribute `.destroyed`
+    which is exactly what it says on the tin. If an entity is destroyed all
+    attempts to access attributes on its interface will result in
+    `AttributeError`. 
 
 The rest of the loop is pretty similiar to the first demo, so this will have to
 be enough for now.
