@@ -2,10 +2,14 @@
 
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import argparse
-import logging as log
-import pygame, math, ecs
+import sys
+import logging
+import math 
+import pygame
+import ecs
 from pygame.locals import *
 
+import copanzers
 from copanzers.systems import *
 from copanzers.util import make_color_surface, RefFloat
 from copanzers import make
@@ -53,19 +57,39 @@ def init_match (entity_manager, w, h, time, args):
 def main (fps, w, h):
 
     parser = argparse.ArgumentParser (prog = "tanks")
+    parser.add_argument ("--verbose", "-v", action = "count", default = 0,
+            help = "Can be given multiple times to increase verbosity.")
+    parser.add_argument ("--quiet",   "-q", action = "count", default = 0,
+            help = "Can be given multiple times to increase quietness.")
+    parser.add_argument ("--script",  "-l", action = "store_true",
+            help = "Only print logs from the script routines.")
+    parser.add_argument ("--speed",   "-s", default = 1, type = int,
+            help = "Factor how fast the game should play (default: 1).")
+
     subs = parser.add_subparsers ()
     demo_parser = subs.add_parser ("demo")
     demo_parser.set_defaults (init = init_demo)
+
     match_parser = subs.add_parser ("match")
     match_parser.add_argument ("scripts", nargs = "+",
             help = "Paths to script files that should battle each other.")
     match_parser.set_defaults (init = init_match)
+
     args = parser.parse_args ()
 
-    pygame.init ()
-    log.basicConfig (format = "%(levelname)s %(name)s\n\t%(message)s\n", 
-            level = log.WARNING)
+    root_logger = logging.getLogger ()
+    root_handler = logging.StreamHandler (sys.stderr)
+    root_handler.setFormatter (
+        logging.Formatter ("%(levelname)s %(name)s\n\t%(message)s\n"))
+    root_logger.addHandler (root_handler)
+    root_logger.setLevel (
+        logging.WARNING + 10 * (args.quiet - args.verbose))
 
+    if args.script:
+        root_filter = logging.Filter ("copanzers.scripts")
+        root_handler.addFilter (root_filter)
+
+    pygame.init ()
     surface = pygame.display.set_mode ( (w, h) )
     clock   = pygame.time.Clock ()
 
@@ -85,8 +109,7 @@ def main (fps, w, h):
     time = RefFloat (0)
     args.init (entity_manager, w, h, time, args)
     
-    frames = 0
-    dt = 1/fps
+    dt = args.speed / fps
 
     while 1:
 
@@ -96,7 +119,6 @@ def main (fps, w, h):
         system_manager.update (dt)
         pygame.display.update ()
         clock.tick (fps)
-        frames += 1
         time += dt
 
 if __name__ == "__main__":
