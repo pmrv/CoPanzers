@@ -139,7 +139,7 @@ def scripted_turret (eman, routine, time, pos):
     e = barrier (eman, 80, s, (h, w), pos)
 
     eman.add_component (e, Mount (((0,0),)))
-    eman.add_component (e, Vision ("plain", 400))
+    eman.add_component (e, Vision ("plain", 350))
     example_weapon (eman, e, 0)
     eman.add_component (e, 
             Script (routine (RWInterface (e, eman), time)))
@@ -158,8 +158,8 @@ def scripted_tank (eman, routine, time, pos):
     eman.add_component (e, mov)
     eman.add_component (e, Mount ( ((0, 0),(0, 0)) ))
     eman.add_component (e, Vision ("plain", 600))
-    radar (eman, e, 1, 1200)
     example_weapon (eman, e, 0)
+    radar (eman, e, 1, 1200)
     eman.add_component (e, 
         Script (routine (RWInterface (e, eman), time))
     )

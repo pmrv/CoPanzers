@@ -2,9 +2,10 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.systems import LogSystem
+from copanzers.systems import (LogSystem, 
+                               components_for_entity, 
+                               destroy_entity)
 from copanzers.components import *
-from copanzers.util import destroy_entity
 
 class MovementSystem (LogSystem):
 
@@ -25,8 +26,8 @@ class MovementSystem (LogSystem):
                         cannot move it.", e)
                 continue 
 
-            pos.x += vel.dx * dt
-            pos.y += vel.dy * dt
+            pos.x += vel.x * dt
+            pos.y += vel.y * dt
 
             if not self.screen.collidepoint (pos):
                 self.log.debug ("%s left the visible screen at %s, removing it.",

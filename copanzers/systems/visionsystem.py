@@ -4,14 +4,13 @@ import math
 
 from copanzers.systems import LogSystem
 from copanzers.components import Vision, Position
-from copanzers.scripts import ROInterface
+from copanzers.scripts import ROInterface, RadarInterface
 
 class VisionSystem (LogSystem):
 
     kinds = {
-        # don't make the distinction yet
         "plain": ROInterface,
-        "radar": ROInterface
+        "radar": RadarInterface,
     }
 
     def update (self, _):

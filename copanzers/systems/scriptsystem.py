@@ -18,8 +18,7 @@ class ScriptSystem (LogSystem):
                     self.log.info ("Script routine for %s finished.", e)
                     finished.append (e)
                 except Exception as err:
-                    self.log.warning ("Script routine for %s failed with \"%s\".",
-                                      e, repr (err))
+                    self.log.exception ("Script routine for %s failed.", e)
                     finished.append (e)
 
         for e in finished:

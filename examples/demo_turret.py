@@ -9,15 +9,9 @@ def destroy_target (w, target):
 
 def main (turret, time):
 
-    x, y = turret.position
     cannon = turret.mounts [0]
     
     for b in filter (lambda x: x ["Class"] == "Barrier", turret.visible):
-        bx, by = b.position
-        dx, dy = bx - x, by - y
-        if dy == 0:
-            cannon.rotation = 0 + math.pi * (dx < 0)
-        else:
-            cannon.rotation = math.acos (dx / math.sqrt (dx**2 + dy**2)) * dy / abs (dy)
+        cannon.rotation = (b.position - turret.position).angle
         
         yield partial (destroy_target, cannon, b)

@@ -1,10 +1,12 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.systems import LogSystem
+from copanzers.systems import (LogSystem, 
+                               components_for_entity, 
+                               destroy_entity)
+
 from copanzers.components import *
 
-from copanzers.util import components_for_entity, destroy_entity
 
 class CollisionSystem (LogSystem):
 

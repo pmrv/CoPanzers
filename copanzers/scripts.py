@@ -31,9 +31,49 @@ def unsure (meth):
     f.__name__ = meth.__name__
     return f
 
+class RadarInterface:
+    """
+    limited read only interface to the components of a entity
+    """
+
+    def __init__ (self, entity, entity_manager):
+        """
+        entity         -- ecs.models.Entity, the entity this 
+                          interface represents
+        entity_manager -- ecs.managers.EntityManager, the manager
+                          where we get the entities components from
+        """
+
+        self.e = entity
+        self.eman = entity_manager
+        self.__throttle = 0
+
+    def __eq__ (self, other):
+        if hasattr (other, "e"):
+            return self.e == other.e
+        else:
+            # in case we want to compare directly an entity
+            return self.e == other 
+
+    @property
+    @unsure
+    # not exactly happy with that, maybe unsure should just raise an error or
+    # something
+    def destroyed (self):
+        return Destroyed in self.eman.database and self.e in self.eman.database [Destroyed]
+
+    @property
+    @unsure
+    def position (self):
+        """
+        Position of the entity.
+        """
+        # we make a shallow copy here so the script routine cannot modify the
+        # position of themselves or other entities
+        return copy (self.eman.component_for_entity (self.e, Position))
 
 # TODO: We should maybe think about making the interfaces flyweights
-class ROInterface:
+class ROInterface (RadarInterface):
     """
     read only interface to the components of a entity
     """
@@ -53,25 +93,11 @@ class ROInterface:
         self.eman = entity_manager
         self.__throttle = 0
 
-    def __eq__ (self, other):
-        if hasattr (other, "e"):
-            return self.e == other.e
-        else:
-            # in case we want to compare directly an entity
-            return self.e == other 
-
     def __getitem__ (self, i):
         try:
             return self.eman.component_for_entity (self.e, Tags) [i]
         except NonexistentComponentTypeForEntity:
             raise KeyError (i)
-
-    @property
-    @unsure
-    # not exactly happy with that, maybe unsure should just raise an error or
-    # something
-    def destroyed (self):
-        return Destroyed in self.eman.database and self.e in self.eman.database [Destroyed]
 
     @property
     @unsure
@@ -99,30 +125,12 @@ class ROInterface:
 
     @property
     @unsure
-    def position (self):
-        """
-        Position of the entity.
-        """
-        # we make a shallow copy here so the script routine cannot modify the
-        # position of themselves or other entities
-        return copy (self.eman.component_for_entity (self.e, Position))
-
-    @property
-    @unsure
     def rotation (self):
         """
         Rotation of the entity, in radians, rotation 0 is parallel to the 
         x-axis.
         """
-        return self.eman.component_for_entity (self.e, Movement).rotation
-
-    @property
-    @unsure
-    def speed (self):
-        """
-        Speed of the entity as a scalar, in px/s.
-        """
-        return self.eman.component_for_entity (self.e, Movement).speed
+        return self.eman.component_for_entity (self.e, Movement).angle
 
     @property
     @unsure
@@ -158,15 +166,23 @@ class RWInterface (ROInterface):
     the script routines
     """
 
-    @ROInterface.speed.setter
-    @unsure
-    def speed (self, val):
-        self.eman.component_for_entity (self.e, Movement).speed = val
-
     @ROInterface.rotation.setter
     @unsure
     def rotation (self, val):
-        self.eman.component_for_entity (self.e, Movement).rotation = val
+        self.eman.component_for_entity (self.e, Movement).angle = val
+
+    @property
+    @unsure
+    def speed (self):
+        """
+        Speed of the entity as a scalar, in px/s.
+        """
+        return self.eman.component_for_entity (self.e, Movement).length
+
+    @speed.setter
+    @unsure
+    def speed (self, val):
+        self.eman.component_for_entity (self.e, Movement).length = val
 
     @property
     @unsure
@@ -182,7 +198,7 @@ class RWInterface (ROInterface):
     def throttle (self, val):
         self.__throttle = min (1, max (0, val))
         mov = self.eman.component_for_entity (self.e, Movement)
-        mov.speed = val * mov.max_speed
+        mov.length = val * mov.max_speed
 
     @property
     @unsure
@@ -266,7 +282,24 @@ class RWInterface (ROInterface):
     @unsure
     def visible (self):
         """
-        Iterator over all living entities that are plainly visible.
+        Iterator over all living entities that are visible to this entity.
         """
         return (i for i in self.eman.component_for_entity (self.e, Vision).visible
                     if not i.destroyed)
+
+    @property
+    @unsure
+    def vision (self):
+        """
+        What kind of vision this entity has.
+        """
+        return self.eman.component_for_entity (self.e, Vision).kind
+
+    @property
+    @unsure
+    def visualrange (self):
+        # hate this name
+        """
+        How far this entity can see, in px.
+        """
+        return self.eman.component_for_entity (self.e, Vision).reach

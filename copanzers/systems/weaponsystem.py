@@ -22,7 +22,7 @@ class WeaponSystem (LogSystem):
 
                 weapon.till_reloaded = weapon.reload_time
 
-                rot = eman.component_for_entity (e, Movement).rotation
+                rot = eman.component_for_entity (e, Movement).angle
                 pos = eman.component_for_entity (e, Position)
                 ign = (eman.component_for_entity (e, Mountable).root,)
 
