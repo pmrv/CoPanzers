@@ -123,8 +123,9 @@ explain a bit more about the second argument the generator function is call with
 * Line 15:
 
     This is line has to important points:  
-    1. the attribute `turret.visible` is an iterator over *all* entities in the
-       game (including the your tank) represented by similar interfaces as your
+    1. the attribute `turret.visible` is an iterator over all living entities 
+       (including the your tank) that within eyeshot of your tank represented 
+       by similar interfaces as your
        tank or your weapon, but in a read-only fashion (again, full docs later)  
     2. the interfaces act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between

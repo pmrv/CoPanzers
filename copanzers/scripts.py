@@ -266,9 +266,7 @@ class RWInterface (ROInterface):
     @unsure
     def visible (self):
         """
-        Return all entities that are plainly visible.
+        Iterator over all living entities that are plainly visible.
         """
-        return self.eman.component_for_entity (
-                self.e,
-                Vision
-        ).visible
+        return (i for i in self.eman.component_for_entity (self.e, Vision).visible
+                    if not i.destroyed)

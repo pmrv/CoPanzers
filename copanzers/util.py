@@ -33,13 +33,8 @@ def destroy_entity (eman, e):
     except NonexistentComponentTypeForEntity:
         pass
     finally:
-        t = eman.component_for_entity (e, Tags)
         eman.remove_entity (e)
         eman.add_component (e, Destroyed ())
-        # add the tags back just in case a script routine is iterating over
-        # its visible entities right now and queries their tags, kind of an
-        # ugly hack
-        eman.add_component (e, t) 
 
 @total_ordering
 class RefFloat:
