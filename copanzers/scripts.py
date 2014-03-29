@@ -4,7 +4,7 @@ from functools import partial
 from ecs.managers import EntityManager
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.util import RefFloat
+from copanzers.util import RefFloat, Vec2d
 from copanzers.components import (Position, 
                                 Destroyed,
                                 Movement,
@@ -46,7 +46,6 @@ class RadarInterface:
 
         self.e = entity
         self.eman = entity_manager
-        self.__throttle = 0
 
     def __eq__ (self, other):
         if hasattr (other, "e"):
@@ -77,21 +76,6 @@ class ROInterface (RadarInterface):
     """
     read only interface to the components of a entity
     """
-
-    def __init__ (self, entity, entity_manager):
-        """
-        entity         -- ecs.models.Entity, the entity this 
-                          interface represents
-        entity_manager -- ecs.managers.EntityManager, the manager
-                          where we get the entities components from
-        """
-
-        if entity is None:
-            raise ValueError ("Can't create a interface to None")
-
-        self.e = entity
-        self.eman = entity_manager
-        self.__throttle = 0
 
     def __getitem__ (self, i):
         try:
@@ -134,15 +118,6 @@ class ROInterface (RadarInterface):
 
     @property
     @unsure
-    def velocity (self):
-        """
-        Velocity of the entity as a 2-tuple, in px/s.
-        """
-        m = self.eman.component_for_entity (self.e, Movement)
-        return m.dx, m.dy
-
-    @property
-    @unsure
     def mounts (self):
         """
         List of either interfaces of mounted entities or None if the respective
@@ -166,6 +141,10 @@ class RWInterface (ROInterface):
     the script routines
     """
 
+    def __init__ (self, *args, **kw):
+        super ().__init__ (*args, **kw)
+        self.__throttle = 0
+
     @ROInterface.rotation.setter
     @unsure
     def rotation (self, val):
@@ -183,6 +162,14 @@ class RWInterface (ROInterface):
     @unsure
     def speed (self, val):
         self.eman.component_for_entity (self.e, Movement).length = val
+
+    @property
+    @unsure
+    def velocity (self):
+        """
+        Velocity of the entity as a Vec2d, in px/s.
+        """
+        return self.eman.component_for_entity (self.e, Movement)
 
     @property
     @unsure

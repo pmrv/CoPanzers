@@ -141,3 +141,61 @@ explain a bit more about the second argument the generator function is call with
 
 The rest of the loop is pretty similiar to the first demo, so this will have to
 be enough for now.
+
+## Interfaces
+Interfaces and their attributes give your script a way to interface neatly with
+entities and their components.
+There are three different types of interfaces so far and each exhibits a couple
+of attributes depending on which components the entity behind the interface
+sports, `RadarInterface`, `ROInterface` and `RWInterface`. The latter being
+supersets of the respective former. `RWInterface` is what you have for the
+tank your script is controlling, everything you get from its `.visible`
+attribute is wrapped in `ROInterface` and everything coming from your radars
+`.visible` is `RadarInterface`. So what are components? Basically data
+about a entity, e.g. `Position` is a component and describes that an entity is
+positioned at a certain point. At the end of this section I'll give you a list
+which thing we encountered so far (tanks, weapons, radars) has which
+components, but first have list of all attributes, what type of interface they
+first appear on and what components are needed for them. If you try to access
+an attribute on an interface and the entity lacks the needed component an
+`AttributeError` will be raised.
+
+ Attribute name | First on Interface | Component needed | Description
+:--------------:|:------------------:|:----------------:|:-----------:
+ `.destroyed`   | `RadarInterface`   |                  | `False` if the entity is alive, if this is `True` the entity is not in the game anymore and all components have been removed from it.
+ `.position`    | `RadarInterface`   | `Position`       | This is a vector, you can treat it like a 2-tuple or use the `.x`, `.y`, `.angle` and `length` attributes, it also supports adding it to other vectors and scalar multiplication, but lacks full docs sofar, check the [source](copanzers/util.py#66) for now.
+ `.hp`          | `ROInterface`      | `Health`         | Current hit points of the entity.
+ `.max_hp`      | `ROInterface`      | `Health`         | Maximum hit points of the entity.
+ `.size`        | `ROInterface`      | `Hitbox`         | Size of the hit box of the entity, 2 tuple.
+ `.rotation`    | `ROInterface`      | `Movement`       | Rotation of the entity, in radians, rotation 0 is parallel to the x-axis.
+ `.mounts`      | `ROInterface`      | `Mount`          | List of either ROInterface of mounted entities or None if the respective mount point is empty.
+ `.root`        | `ROInterface`      | `Mountable`      | The entity this entity is mounted on, e.g. your tank on the interface of its weapon.
+ `.mounts`      | `RWInterface`      | `Mount`          | List of either RWInterface of mounted entities or None if the respective mount point is empty. Tricky, huh.
+ `.rotation`    | `RWInterface`      | `Movement`       | Same as on `ROInterface` but you can set it now.
+ `.speed`       | `RWInterface`      | `Movement`       | Speed of the entity as a scalar, in px/s.
+ `.velocity`    | `RWInterface`      | `Movement`       | Velocity of the entity as a vector (same kind as `.position`), in px/s. 
+ `.throttle`    | `RWInterface`      | `Movement`       | Speed of the entity in percent, setter clamps the value between 0 and 1.
+ `.shoot`       | `RWInterface`      | `Weapon`         | Attention, this one's a method no attribute. Calling this will shoot a bullet, if the weapon is reloaded. The bullet will fly in the direction of the `.rotation` attribute of the weapon.
+ `.till_reloaded`|`RWInterface`      | `Weapon`         | Seconds until this weapon can fire again.
+ `.reload_time` | `RWInterface`      | `Weapon`         | Minimum time between shots, in seconds.
+ `.bullet_damage`|`RWInterface`      | `Weapon`         | Damage done by this weapon's bullets of this weapon.
+ `.bullet_speed`| `RWInterface`      | `Weapon`         | Speed of this weapon's bullets, in px/s.
+ `.bullet_hp`   | `RWInterface`      | `Weapon`         | Hit points of this weapon's bullets.
+ `.bullet_size` | `RWInterface`      | `Weapon`         | Similar to `.size` but for this weapon's bullets.
+ `.visible`     | `RWInterface`      | `Vision`         | Iterator over all living entities that are visible to this entity. The type of interface they're wrapped depends on `.vision`. For "radar" it's `RadarInterface`, for "plain" `ROInterface`.
+ `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity this entity has, currently either "plain" or "radar".
+ `.visualrange` | `RWInterface`      | `Vision`         | How far this entity can see, in px.
+
+I don't like half of the attribute name in here, so shoot me ideas if you have
+them.
+
+ Component | Tank | Weapon | Radar
+:----------|:----:|:------:|:-----:
+`Position` | x    | x      | x
+`Hitbox`   | x    |        |  
+`Health`   | x    |        |  
+`Movement` | x    | x      |  
+`Mount`    | x    |        |  
+`Mountable`|      | x      | x
+`Weapon`   |      | x      |  
+`Vision`   | x    |        | x
