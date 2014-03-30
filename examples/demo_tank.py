@@ -51,7 +51,7 @@ def main (tank, time):
 
     for o in radar.visible:
         d = o.position - tank.position
-        if abs (d) <= 200 and not d.x == d.y == 0:
+        if abs (d) <= 200 and o != tank and o not in tank.mounts:
             cannon.rotation = d.angle
             yield partial (destroy_target, cannon, o)
 

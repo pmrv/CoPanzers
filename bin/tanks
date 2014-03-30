@@ -98,13 +98,13 @@ def main (fps, w, h):
 
     system_manager.add_system (MovementSystem (w, h))
     system_manager.add_system (HealthSystem ())
-    system_manager.add_system (HealthRenderSystem (surface))
     system_manager.add_system (WeaponSystem ())
     system_manager.add_system (MountSystem ())
     system_manager.add_system (CollisionSystem ())
     system_manager.add_system (VisionSystem ())
     system_manager.add_system (ScriptSystem ())
     system_manager.add_system (RenderSystem (surface))
+    system_manager.add_system (HealthRenderSystem (surface))
 
     time = RefFloat (0)
     args.init (entity_manager, w, h, time, args)

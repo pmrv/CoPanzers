@@ -47,18 +47,16 @@ The general process followed by the game is this:
 4. goto 2.   
 
 So with that in mind let's look over
-[examples/demo_tank.py](examples/demo_tank.py#L20) to get some of the details
+[examples/demo_tank.py](examples/demo_tank.py#L19) to get some of the details
 straight.
 
-* Line 20-22:
+* Line [19-21](examples/demo_tank.py#L19):
 
     As I said previously the first argument is an interface to your tank. This
     is a reference so the exact value of e.g. `tank.position` *will* change
     over time, but *only* when your generator is currently not executing.
-    There are other attributes to this interface than your position but I
-    haven't managed to write a full documentation just yet.
 
-* Line 24-26
+* Line [23-25](examples/demo_tank.py#L23)
 
     It's getting a little bit more interesting now. We're setting the tank to
     full speed and rotate by -90°, i.e. to the top. After that we yield a
@@ -71,76 +69,94 @@ straight.
     continue to run and 'wake' us when the condition encoded in the function is
     true.
 
-* Line 29-40:
+* Line [27-38](examples/demo_tank.py#L27):
 
     Now those are some minor variations of the former theme, just to drive the
     point home.
 
-* Line 42:
+* Line [40](examples/demo_tank.py#L40):
 
     Just something to ease debugging of your scripts, check
     [this](pytanks/scripts.py#L15) if you're familiar with python `logging`
     module.
 
-* Line 44:
+* Line [43](examples/demo_tank.py#L43):
 
-    It's getting a bit complicated here to show that the function we return
-    don't have to be without side effects, but are actually a pretty good place
-    to do some periodic stuff as it is called every tick of the game. Note that
-    you don't have to use partial function application to pull this off, you can
-    also use closures and nested function definitions to achieve the same, I
-    just don't like it as much. You can also use sub-generators and the `yield from`
-    syntax python provides. The `time` you see in there is a reference 
+    This is just to show you, that you can still encapsulate behaviour like you can
+    with function, just that you use sub generators and the `yield from` syntax
+    now. The `time` you see in there is a reference 
     to the total elapsed time in the course of the game, but it's one of the 
     more ugly parts and likely to change in the future, so I'd rather not spend 
     so much time on that. Just note that with `abs (time)` you can turn it into
     a normal `float` and that its value will change monotonic as the game
     progresses.
 
+* Line [49](examples/demo_tank.py#L49):
+
+    So there is stuff mounted on you tank. Some more on that in the next
+    example and next section. For now it's first its weapon and
+    then its radar. You can always check it with `[print (m ["Class"]) for m in
+    tank.mounts]`, though. Check next section with details on both.
+
+* Line [52](examples/demo_tank.py#L52):
+
+    This will iterate over all entities visible on your radar, but there's a
+    catch. The loop will only go over entities that were visible at the time
+    the loop started. If you yield in the loop, as we do here, this might not
+    be everything there is to see. I don't have an easy fix for this though, so
+    meh™.
+
+* Line [53-54](examples/demo_tank.py#L53):
+
+    Positions are vectors, so you can add and subtract them and some more, check the next
+    section for some details.
+
+* Line [54](examples/demo_tank.py#L54):
+
+    Interfaces of all types are comparable to each other will compare equal if
+    they refer to the same entity, we use this here to not target ourselves.
+
+* Line [56](examples/demo_tank.py#L56)
+
+    It's getting a bit complicated here to show that the function we return
+    don't have to be without side effects, but are actually a pretty good place
+    to do some periodic stuff as it is called every tick of the game. Note that
+    you don't have to use partial function application to pull this off, you can
+    also use closures and nested function definitions to achieve the same, I
+    just don't like it as much. 
+
 You will notice that the tank also has a weapon and we will see in 
 [examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also 
 explain a bit more about the second argument the generator function is call with.
 
-* Line 13:
+* Line [12](examples/demo_turret.py#L12):
     
     So this is where weapons come in. Your tank has a attribute `.mount` which
     is a list of all stuff mounted on top of it (only one weapon so far, but
     that may change in the future). The weapon has a very similar interface to
     the one of your tank, but obviously some attributes will be different or
-    not existent (I may or may not provide full or incomplete documentation on
-    interfaces later™). Examples of attributes are:  
-    * .position: as the weapon may not be mounted in center of your tank  
-    * .rotation: in which direction you're pointing the thing  
-    * .reload_time: the time it takes to reload the weapon  
-    * .till_reloaded: the time until you can fire the next time  
-    * .shoot ():  
+    not existent, check the next section for details.
 
-        this one's a method and will fire the weapon if possible,
-        note that as 'time is frozen' when your generator is running, calling
-        it twice will not shoot twice, the second call will fail to fire the
-        weapon since it's not reloaded yet
-
-* Line 15:
+* Line [14](examples/demo_turret.py#L14):
 
     This is line has to important points:  
     1. the attribute `turret.visible` is an iterator over all living entities 
        (including the your tank) that within eyeshot of your tank represented 
        by similar interfaces as your
-       tank or your weapon, but in a read-only fashion (again, full docs later)  
-    2. the interfaces act like dictionary storing some meta data about the
+       tank or your weapon, but in a read-only fashion
+    2. the interfaces (except `RadarInterface`, see next section) 
+       act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between
        barriers, tanks, turret or bullets; if an entity is not tagged with a
-       certain key it will raise a `KeyError` just like an ordinary dictionary  
+       certain key it will raise a `KeyError` just like an ordinary dictionary,
+       there will be docs on the keys employed by the game later™
 
-* Line 8:
+* Line [5](examples/demo_turret.py#L5):
 
     Every interface we talked about so far also has a attribute `.destroyed`
     which is exactly what it says on the tin. If an entity is destroyed all
     attempts to access attributes on its interface will result in
     `AttributeError`. 
-
-The rest of the loop is pretty similiar to the first demo, so this will have to
-be enough for now.
 
 ## Interfaces
 Interfaces and their attributes give your script a way to interface neatly with
@@ -158,7 +174,9 @@ which thing we encountered so far (tanks, weapons, radars) has which
 components, but first have list of all attributes, what type of interface they
 first appear on and what components are needed for them. If you try to access
 an attribute on an interface and the entity lacks the needed component an
-`AttributeError` will be raised.
+`AttributeError` will be raised. Interfaces refering to the same entity will
+compare equal. From `ROInterface` on interfaces can be indexed (read-only) like
+dictionaries for some meta data (docs pending).
 
  Attribute name | First on Interface | Component needed | Description
 :--------------:|:------------------:|:----------------:|:-----------:
@@ -185,6 +203,7 @@ an attribute on an interface and the entity lacks the needed component an
  `.visible`     | `RWInterface`      | `Vision`         | Iterator over all living entities that are visible to this entity. The type of interface they're wrapped depends on `.vision`. For "radar" it's `RadarInterface`, for "plain" `ROInterface`.
  `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity this entity has, currently either "plain" or "radar".
  `.visualrange` | `RWInterface`      | `Vision`         | How far this entity can see, in px.
+
 
 I don't like half of the attribute name in here, so shoot me ideas if you have
 them.
