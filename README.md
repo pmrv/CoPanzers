@@ -190,9 +190,9 @@ dictionaries for some meta data (docs pending).
  `.max_hp`      | `ROInterface`      | `Health`         | Maximum hit points of the entity.
  `.size`        | `ROInterface`      | `Hitbox`         | Size of the hit box of the entity, 2 tuple.
  `.rotation`    | `ROInterface`      | `Movement`       | Rotation of the entity, in radians, rotation 0 is parallel to the x-axis.
- `.mounts`      | `ROInterface`      | `Mount`          | List of either ROInterface of mounted entities or None if the respective mount point is empty.
+ `.mounts`      | `ROInterface`      | `Mount`          | List of either `ROInterface` of mounted entities or None if the respective mount point is empty.
  `.root`        | `ROInterface`      | `Mountable`      | The entity this entity is mounted on, e.g. your tank on the interface of its weapon.
- `.mounts`      | `RWInterface`      | `Mount`          | List of either RWInterface of mounted entities or None if the respective mount point is empty. Tricky, huh.
+ `.mounts`      | `RWInterface`      | `Mount`          | List of either `RWInterface` of mounted entities or None if the respective mount point is empty. Tricky, huh.
  `.rotation`    | `RWInterface`      | `Movement`       | Same as on `ROInterface` but you can set it now.
  `.speed`       | `RWInterface`      | `Movement`       | Speed of the entity as a scalar, in px/s.
  `.velocity`    | `RWInterface`      | `Movement`       | Velocity of the entity as a vector (same kind as `.position`), in px/s. 
