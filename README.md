@@ -167,15 +167,19 @@ sports, `RadarInterface`, `ROInterface` and `RWInterface`. The latter being
 supersets of the respective former. `RWInterface` is what you have for the
 tank your script is controlling, everything you get from its `.visible`
 attribute is wrapped in `ROInterface` and everything coming from your radars
-`.visible` is `RadarInterface`. So what are components? Basically data
-about a entity, e.g. `Position` is a component and describes that an entity is
-positioned at a certain point. At the end of this section I'll give you a list
+`.visible` is `RadarInterface`.  
+So what are components? Basically data about a entity, e.g. `Position` is a 
+component and describes that an entity is positioned at a certain point. 
+At the end of this section I'll give you a list
 which thing we encountered so far (tanks, weapons, radars) has which
 components, but first have list of all attributes, what type of interface they
-first appear on and what components are needed for them. If you try to access
+first appear on and what components are needed for them.  
+If you try to access
 an attribute on an interface and the entity lacks the needed component an
-`AttributeError` will be raised. Interfaces refering to the same entity will
-compare equal. From `ROInterface` on interfaces can be indexed (read-only) like
+`AttributeError` will be raised.  
+Interfaces refering to the same entity will
+compare equal.  
+From `ROInterface` on interfaces can be indexed (read-only) like
 dictionaries for some meta data (docs pending).
 
  Attribute name | First on Interface | Component needed | Description
