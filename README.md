@@ -139,7 +139,7 @@ explain a bit more about the second argument the generator function is call with
 
 * Line [14](examples/demo_turret.py#L14):
 
-    This is line has to important points:  
+    This is line has two important points:  
     1. the attribute `turret.visible` is an iterator over all living entities 
        (including the your tank) that within eyeshot of your tank represented 
        by similar interfaces as your
