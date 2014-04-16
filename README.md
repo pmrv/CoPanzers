@@ -63,7 +63,7 @@ straight.
     function that will return `False` until the tank moved up so the y
     coordinate of its position is smaller 50. Keep in mind that for some stupid
     reason the origin is in the top left corner in computer graphics.
-    This is the important step, until now our generator ran indisturbed and the
+    This is the important step, until now our generator ran undisturbed and the
     value of `tank.position` didn't change (since it was the only thing
     running), now that we yielded the function the rest of the game will
     continue to run and 'wake' us when the condition encoded in the function is
@@ -77,7 +77,7 @@ straight.
 * Line [40](examples/demo_tank.py#L40):
 
     Just something to ease debugging of your scripts, check
-    [this](pytanks/scripts.py#L15) if you're familiar with python `logging`
+    [this](copanzers/scripts.py#L17) if you're familiar with python `logging`
     module.
 
 * Line [43](examples/demo_tank.py#L43):

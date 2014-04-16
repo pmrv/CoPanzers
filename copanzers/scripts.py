@@ -56,8 +56,8 @@ class RadarInterface:
 
     @property
     @unsure
-    # not exactly happy with that, maybe unsure should just raise an error or
-    # something
+    # not exactly happy with that, maybe unsure should just raise an error 
+    # when someone tries to access values on a destroyed entity
     def destroyed (self):
         return Destroyed in self.eman.database and self.e in self.eman.database [Destroyed]
 
