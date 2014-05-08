@@ -4,7 +4,7 @@
 import argparse
 import sys
 import logging
-import math 
+import math
 import pygame
 import ecs
 from pygame.locals import *
@@ -37,7 +37,7 @@ def init_demo (entity_manager, w, h, time, _):
             time, (w * .1, h * .9))
 
     make.scripted_tank (entity_manager, 
-            load_routine ("examples/demo_tank.py"), 
+            load_routine ("examples/demo_tank.py"),
             time, (w * .5, h * .5))
 
 def init_match (entity_manager, w, h, time, args):
@@ -47,8 +47,8 @@ def init_match (entity_manager, w, h, time, args):
     
     for i in range (n):
         make.scripted_tank (
-                entity_manager, 
-                load_routine (args.scripts [i]), 
+                entity_manager,
+                load_routine (args.scripts [i]),
                 time,
                 # ahaha inline ifs!
                 (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
@@ -122,4 +122,5 @@ def main (fps, w, h):
         time += dt
 
 if __name__ == "__main__":
+    
     main (30, 640, 340)
