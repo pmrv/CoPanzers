@@ -20,19 +20,6 @@ def components_for_entity (eman, entity, components):
 
     return tuple (eman.component_for_entity (entity, c) for c in components)
 
-def destroy_entity (eman, e):
-    """
-    remove an entity and all mounted entities from the entity manager
-    """
-    try:
-        for m in eman.component_for_entity (e, Mount).mounts:
-            destroy_entity (eman, m)
-    except NonexistentComponentTypeForEntity:
-        pass
-    finally:
-        eman.remove_entity (e)
-        eman.add_component (e, Destroyed ())
-
 from .movementsystem     import MovementSystem
 from .healthsystem       import HealthSystem
 from .rendersystem       import RenderSystem
@@ -42,3 +29,4 @@ from .weaponsystem       import WeaponSystem
 from .collisionsystem    import CollisionSystem
 from .scriptsystem       import ScriptSystem
 from .visionsystem       import VisionSystem
+from .killsystem         import KillSystem

@@ -2,9 +2,7 @@
 import pygame
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.systems import (LogSystem, 
-                               components_for_entity, 
-                               destroy_entity)
+from copanzers.systems import LogSystem
 from copanzers.components import *
 
 class MovementSystem (LogSystem):
@@ -32,13 +30,10 @@ class MovementSystem (LogSystem):
             if not self.screen.collidepoint (pos):
                 self.log.debug ("%s left the visible screen at %s, removing it.",
                         e, pos)
-                remove.append (e) # remove all entities which disappear from the game screen
+                self.entity_manager.add_component (e, Destroyed ())
 
             try:
                 hitbox = self.entity_manager.component_for_entity (e, Hitbox)
                 hitbox.center = pos.x, pos.y
             except NonexistentComponentTypeForEntity:
                 continue
-
-        for e in remove:
-            destroy_entity (self.entity_manager,e)

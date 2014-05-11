@@ -2,8 +2,7 @@
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from copanzers.systems import (LogSystem, 
-                               components_for_entity, 
-                               destroy_entity)
+                               components_for_entity)
 
 from copanzers.components import *
 
@@ -14,7 +13,6 @@ class CollisionSystem (LogSystem):
         # for now just do collision detection for Projectiles
 
         eman = self.entity_manager
-        destroyed = [] # projectiles which hit a target
         for e, proj in eman.pairs_for_type (Projectile):
             
             try:
@@ -41,7 +39,7 @@ class CollisionSystem (LogSystem):
                 if ehit.colliderect (ohit):
 
                     self.log.debug ("Projectile %s hit %s.", e, o)
-                    destroyed.append (e)
+                    eman.add_component (e, Destroyed ())
 
                     try:
                         ohealth = eman.component_for_entity (o, Health)
@@ -52,5 +50,3 @@ class CollisionSystem (LogSystem):
 
                     break
 
-        for e in destroyed:
-            destroy_entity (eman, e)

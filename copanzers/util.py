@@ -67,7 +67,7 @@ class Vec2d:
     """ Simple two-dimensional vector implementation """
 
     __slots__ = "x", "y", "_Vec2d__nullangle"
-    
+
     def __init__ (self, x, y):
         self.x = x
         self.y = y
