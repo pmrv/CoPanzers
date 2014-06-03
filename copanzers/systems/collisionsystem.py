@@ -14,7 +14,7 @@ class CollisionSystem (LogSystem):
 
         eman = self.entity_manager
         for e, proj in eman.pairs_for_type (Projectile):
-            
+
             try:
                 ehit, epos = components_for_entity (eman, e, (Hitbox, Position))
                 ehit.center = epos.x, epos.y
@@ -30,7 +30,7 @@ class CollisionSystem (LogSystem):
                     opos = eman.component_for_entity (o, Position)
                 except:
                     self.log.debug ("Skipping %s for collision dectection as it \
-                            has no Hitbox component.", o)
+                            has no Position component.", o)
                     continue
 
                 ohit.center = opos.x, opos.y
