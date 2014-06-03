@@ -116,10 +116,7 @@ class Vec2d:
         x, y = self
         if x == y == 0:
             return self.__nullangle
-        if y == 0:
-            return 0 + math.pi * (x < 0)
-        else:
-            return math.acos (x / math.sqrt (x**2 + y**2)) * y / abs (y)
+        return math.atan2 (y, x)
 
     @angle.setter
     def angle (self, a):
