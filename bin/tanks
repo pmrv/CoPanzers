@@ -44,7 +44,7 @@ def init_match (entity_manager, w, h, time, args):
 
     n = len (args.scripts)
     offset = 100
-    
+
     for i in range (n):
         make.scripted_tank (
                 entity_manager,
@@ -109,7 +109,7 @@ def main (fps, w, h):
 
     time = RefFloat (0)
     args.init (entity_manager, w, h, time, args)
-    
+
     dt = args.speed / fps
 
     while 1:
@@ -123,5 +123,4 @@ def main (fps, w, h):
         time += dt
 
 if __name__ == "__main__":
-    
     main (30, 640, 340)
