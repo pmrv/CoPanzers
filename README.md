@@ -11,7 +11,7 @@ requires Python3, [pygame][] and [ecs][].
 Grab [pygame][] from your favorite package manager and [ecs][] from PyPI (`pip
 install ecs`).
 
-Then `./bin/tanks/ demo` should create a window with a bit of stuff going on.  
+Then `./bin/tanks demo` should create a window with a bit of stuff going on.  
 There will be two turret shooting at things and a tank driving around doing
 nothing in particular. You may have to squint a bit to recognize them as I may have
 been a bit laz… abstract when designing the textures.  
