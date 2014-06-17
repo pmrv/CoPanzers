@@ -205,7 +205,7 @@ dictionaries for some meta data (docs pending).
  `.bullet_hp`   | `RWInterface`      | `Weapon`         | Hit points of this weapon's bullets.
  `.bullet_size` | `RWInterface`      | `Weapon`         | Similar to `.size` but for this weapon's bullets.
  `.visible`     | `RWInterface`      | `Vision`         | Iterator over all living entities that are visible to this entity. The type of interface they're wrapped depends on `.vision`. For "radar" it's `RadarInterface`, for "plain" `ROInterface`.
- `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity this entity has, currently either "plain" or "radar".
+ `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity has, currently either "plain" or "radar".
  `.visualrange` | `RWInterface`      | `Vision`         | How far this entity can see, in px.
 
 
