@@ -11,7 +11,7 @@ requires Python3, [pygame][] and [ecs][].
 Grab [pygame][] from your favorite package manager and [ecs][] from PyPI (`pip
 install ecs`).
 
-Then `./bin/tanks/ demo` should create a window with a bit of stuff going on.
+Then `./bin/tanks demo` should create a window with a bit of stuff going on.
 There will be two turret shooting at things and a tank driving around doing
 nothing in particular. You may have to squint a bit to recognize them as I may have
 been a bit laz… abstract when designing the textures.
@@ -168,7 +168,7 @@ sports, `RadarInterface`, `ROInterface` and `RWInterface`. The latter being
 supersets of the respective former. `RWInterface` is what you have for the
 tank your script is controlling, everything you get from its `.visible`
 attribute is wrapped in `ROInterface` and everything coming from your radars
-`.visible` is `RadarInterface`. 
+`.visible` is `RadarInterface`.
 
 So what are components? Basically data about a entity, e.g. `Position` is a
 component and describes that an entity is positioned at a certain point.
@@ -196,7 +196,7 @@ type for a given entity.  From `ROInterface` on interfaces can be indexed
  `.mounts`      | `RWInterface`      | `Mount`          | List of either `RWInterface` of mounted entities or None if the respective mount point is empty. Tricky, huh.
  `.rotation`    | `RWInterface`      | `Movement`       | Same as on `ROInterface` but you can set it now.
  `.speed`       | `RWInterface`      | `Movement`       | Speed of the entity as a scalar, in px/s.
- `.velocity`    | `RWInterface`      | `Movement`       | Velocity of the entity as a vector (same kind as `.position`), in px/s. 
+ `.velocity`    | `RWInterface`      | `Movement`       | Velocity of the entity as a vector (same kind as `.position`), in px/s.
  `.throttle`    | `RWInterface`      | `Movement`       | Speed of the entity in percent, setter clamps the value between 0 and 1.
  `.shoot`       | `RWInterface`      | `Weapon`         | Attention, this one's a method no attribute. Calling this will shoot a bullet, if the weapon is reloaded. The bullet will fly in the direction of the `.rotation` attribute of the weapon.
  `.till_reloaded`|`RWInterface`      | `Weapon`         | Seconds until this weapon can fire again.
@@ -206,7 +206,7 @@ type for a given entity.  From `ROInterface` on interfaces can be indexed
  `.bullet_hp`   | `RWInterface`      | `Weapon`         | Hit points of this weapon's bullets.
  `.bullet_size` | `RWInterface`      | `Weapon`         | Similar to `.size` but for this weapon's bullets.
  `.visible`     | `RWInterface`      | `Vision`         | Iterator over all living entities that are visible to this entity. The type of interface they're wrapped depends on `.vision`. For "radar" it's `RadarInterface`, for "plain" `ROInterface`.
- `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity this entity has, currently either "plain" or "radar".
+ `.vision`      | `RWInterface`      | `Vision`         | What kind of vision this entity has, currently either "plain" or "radar".
  `.visualrange` | `RWInterface`      | `Vision`         | How far this entity can see, in px.
 
 
