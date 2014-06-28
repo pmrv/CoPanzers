@@ -30,24 +30,31 @@ thing about generators is that they allow us to start/stop execution at almost
 arbitrary points in functions.
 
 The only constraints on you script files are:
+
 1. they contain valid python (this is why you want to watch whose scripts you
    run, nothing stops a script from running `shutil.rmtree ("~")`)
+
 2. they have a generator function called `main` which takes two arguments
    (which I'll explain later)
+
 3. they yield functions taking no arguments which return either `True` or
    `False`
 
 The general process followed by the game is this:
+
 1. it calls `main` with an object representing the tank your script controls
    and an object that has some info about the battlefield (for now the total
    elapsed time and its size, aptly named `.time` and `.size`, thereby instantiating
    the generator
+
 2. each tick of the game the function last yielded by your generator is
    executed (`lambda: True` in the first tick), if it returns `True` execution in
    your generator is resumed, if not the game will just retry in the next tick
+
 3. your generator runs until you yield the next function, during that period
    the game does *nothing* else, i.e. *between* `yields` everything is static,
    but also that malicious scripts can halt the whole game
+
 4. goto 2.
 
 So with that in mind let's look over
