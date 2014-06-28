@@ -11,40 +11,44 @@ requires Python3, [pygame][] and [ecs][].
 Grab [pygame][] from your favorite package manager and [ecs][] from PyPI (`pip
 install ecs`).
 
-Then `./bin/tanks/ demo` should create a window with a bit of stuff going on.  
+Then `./bin/tanks/ demo` should create a window with a bit of stuff going on.
 There will be two turret shooting at things and a tank driving around doing
 nothing in particular. You may have to squint a bit to recognize them as I may have
-been a bit laz… abstract when designing the textures.  
+been a bit laz… abstract when designing the textures.
+
 So the twist is that this behaviour is not hardcoded into the demo but
 controlled by (more or less) simple python coroutines. They are found in
 [examples/](examples/), feel free to play around with them once I
-have explained how they work.  
+have explained how they work.
+
 You can also have a number routines battle each other with `./bin/tanks match
-path/script1.py path/script2.py …`. 
+path/script1.py path/script2.py …`.
 
 ## Scripts
 I'll just assume you know about python's function generators for now. The cool
 thing about generators is that they allow us to start/stop execution at almost
-arbitrary points in functions.  
-The only constraints on you script files are:  
+arbitrary points in functions.
+
+The only constraints on you script files are:
 1. they contain valid python (this is why you want to watch whose scripts you
-   run, nothing stops a script from running `shutil.rmtree ("~")`)  
+   run, nothing stops a script from running `shutil.rmtree ("~")`)
 2. they have a generator function called `main` which takes two arguments
-   (which I'll explain later)  
+   (which I'll explain later)
 3. they yield functions taking no arguments which return either `True` or
    `False`
 
-The general process followed by the game is this:  
+The general process followed by the game is this:
 1. it calls `main` with an object representing the tank your script controls
-   and a reference to the total elapsed time in the game, thereby instantiating
-   the generator  
+   and an object that has some info about the battlefield (for now the total
+   elapsed time and its size, aptly named `.time` and `.size`, thereby instantiating
+   the generator
 2. each tick of the game the function last yielded by your generator is
    executed (`lambda: True` in the first tick), if it returns `True` execution in
-   your generator is resumed, if not the game will just retry in the next tick  
+   your generator is resumed, if not the game will just retry in the next tick
 3. your generator runs until you yield the next function, during that period
    the game does *nothing* else, i.e. *between* `yields` everything is static,
-   but also that malicious scripts can halt the whole game  
-4. goto 2.   
+   but also that malicious scripts can halt the whole game
+4. goto 2.
 
 So with that in mind let's look over
 [examples/demo_tank.py](examples/demo_tank.py#L19) to get some of the details
@@ -82,14 +86,10 @@ straight.
 
 * Line [43](examples/demo_tank.py#L43):
 
-    This is just to show you, that you can still encapsulate behaviour like you can
-    with function, just that you use sub generators and the `yield from` syntax
-    now. The `time` you see in there is a reference 
-    to the total elapsed time in the course of the game, but it's one of the 
-    more ugly parts and likely to change in the future, so I'd rather not spend 
-    so much time on that. Just note that with `abs (time)` you can turn it into
-    a normal `float` and that its value will change monotonic as the game
-    progresses.
+    This is just to show you that you can still encapsulate behaviour like you can
+    with functions, just that you use sub generators and the `yield from` syntax
+    now. `game.time` as mentioned earlier is just a float telling you how much
+    time has passed.
 
 * Line [49](examples/demo_tank.py#L49):
 
@@ -123,14 +123,14 @@ straight.
     to do some periodic stuff as it is called every tick of the game. Note that
     you don't have to use partial function application to pull this off, you can
     also use closures and nested function definitions to achieve the same, I
-    just don't like it as much. 
+    just don't like it as much.
 
-You will notice that the tank also has a weapon and we will see in 
-[examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also 
+You will notice that the tank also has a weapon and we will see in
+[examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also
 explain a bit more about the second argument the generator function is call with.
 
 * Line [12](examples/demo_turret.py#L12):
-    
+
     So this is where weapons come in. Your tank has a attribute `.mount` which
     is a list of all stuff mounted on top of it (only one weapon so far, but
     that may change in the future). The weapon has a very similar interface to
@@ -139,12 +139,12 @@ explain a bit more about the second argument the generator function is call with
 
 * Line [14](examples/demo_turret.py#L14):
 
-    This is line has two important points:  
-    1. the attribute `turret.visible` is an iterator over all living entities 
-       (including the your tank) that within eyeshot of your tank represented 
+    This is line has two important points:
+    1. the attribute `turret.visible` is an iterator over all living entities
+       (including the your tank) that within eyeshot of your tank represented
        by similar interfaces as your
        tank or your weapon, but in a read-only fashion
-    2. the interfaces (except `RadarInterface`, see next section) 
+    2. the interfaces (except `RadarInterface`, see next section)
        act like dictionary storing some meta data about the
        entity in question, e.g. the "Class" key lets you distinguish between
        barriers, tanks, turret or bullets; if an entity is not tagged with a
@@ -156,31 +156,32 @@ explain a bit more about the second argument the generator function is call with
     Every interface we talked about so far also has a attribute `.destroyed`
     which is exactly what it says on the tin. If an entity is destroyed all
     attempts to access attributes on its interface will result in
-    `AttributeError`. 
+    `AttributeError`.
 
 ## Interfaces
 Interfaces and their attributes give your script a way to interface neatly with
 entities and their components.
+
 There are three different types of interfaces so far and each exhibits a couple
 of attributes depending on which components the entity behind the interface
 sports, `RadarInterface`, `ROInterface` and `RWInterface`. The latter being
 supersets of the respective former. `RWInterface` is what you have for the
 tank your script is controlling, everything you get from its `.visible`
 attribute is wrapped in `ROInterface` and everything coming from your radars
-`.visible` is `RadarInterface`.  
-So what are components? Basically data about a entity, e.g. `Position` is a 
-component and describes that an entity is positioned at a certain point. 
+`.visible` is `RadarInterface`. 
+
+So what are components? Basically data about a entity, e.g. `Position` is a
+component and describes that an entity is positioned at a certain point.
 At the end of this section I'll give you a list
 which thing we encountered so far (tanks, weapons, radars) has which
 components, but first have list of all attributes, what type of interface they
-first appear on and what components are needed for them.  
-If you try to access
-an attribute on an interface and the entity lacks the needed component an
-`AttributeError` will be raised.  
-Interfaces refering to the same entity will
-compare equal.  
-From `ROInterface` on interfaces can be indexed (read-only) like
-dictionaries for some meta data (docs pending).
+first appear on and what components are needed for them.
+
+If you try to access an attribute on an interface and the entity lacks the
+needed component an `AttributeError` will be raised.  Interfaces refering to
+the same entity are the same, there is only one instance of a given interface
+type for a given entity.  From `ROInterface` on interfaces can be indexed
+(read-only) like dictionaries for some meta data (docs pending).
 
  Attribute name | First on Interface | Component needed | Description
 :--------------:|:------------------:|:----------------:|:-----------:
@@ -215,10 +216,10 @@ them.
  Component | Tank | Weapon | Radar
 :----------|:----:|:------:|:-----:
 `Position` | x    | x      | x
-`Hitbox`   | x    |        |  
-`Health`   | x    |        |  
-`Movement` | x    | x      |  
-`Mount`    | x    |        |  
+`Hitbox`   | x    |        |
+`Health`   | x    |        |
+`Movement` | x    | x      |
+`Mount`    | x    |        |
 `Mountable`|      | x      | x
-`Weapon`   |      | x      |  
+`Weapon`   |      | x      |
 `Vision`   | x    |        | x
