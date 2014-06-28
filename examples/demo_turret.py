@@ -7,11 +7,11 @@ def destroy_target (w, target):
         w.shoot ()
     return target.destroyed
 
-def main (turret, time):
+def main (turret, game):
 
     cannon = turret.mounts [0]
-    
+
     for b in filter (lambda x: x ["Class"] == "Barrier", turret.visible):
         cannon.rotation = (b.position - turret.position).angle
-        
+
         yield partial (destroy_target, cannon, b)

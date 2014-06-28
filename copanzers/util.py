@@ -12,59 +12,8 @@ def make_color_surface (size, color, colorkey = (255, 255, 255)):
 def Rect (center, size):
     return pygame.Rect (center [0] - size [0] / 2, center [1] - size [1] / 2, *size)
 
-@total_ordering
-class RefFloat:
-    """ Mutable float. Only implements addition, since this appears to be
-    everything we need. """
-    def __init__ (self, f):
-        self.__f = f
-
-    def __eq__ (self, o):
-        return self.__f.__eq__ (o)
-
-    def __lt__ (self, o):
-        return self.__f.__lt__ (o)
-
-    def __add__ (self, o):
-        if isinstance (o, RefFloat):
-            # this only works because self and o are of the same class
-            return self.__f.__add__ (o.__f)
-        else:
-            return self.__f.__add__ (o)
-
-    def __sub__ (self, o):
-        if isinstance (o, RefFloat):
-            # this only works because self and o are of the same class
-            return self.__f.__sub__ (o.__f)
-        else:
-            return self.__f.__sub__ (o)
-
-    def __radd__ (self, o):
-        return self.__f.__radd__ (o)
-
-    def __rsub__ (self, o):
-        return self.__f.__rsub__ (o)
-
-
-    def __iadd__ (self, o):
-        self.__f += o
-        return self
-
-    def __isub__ (self, o):
-        self.__f -= o
-        return self
-
-    def __str__ (self):
-        return str (self.__f)
-
-    def __repr__ (self):
-        return "RefFloat({})".format (self.__f)
-
-    def __abs__ (self):
-        return self.__f
-
 class Vec2d:
-    """ Simple two-dimensional vector implementation """
+    """ Simple two-dimensional vector """
 
     __slots__ = "x", "y", "_Vec2d__nullangle"
 
@@ -95,7 +44,7 @@ class Vec2d:
             raise IndexError ("Index must be in {0, 1}.")
 
     def __abs__ (self):
-        return math.sqrt (self.x ** 2 + self.y ** 2) 
+        return math.sqrt (self.x ** 2 + self.y ** 2)
 
     @property
     def length (self):

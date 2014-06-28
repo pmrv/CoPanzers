@@ -9,14 +9,14 @@ def destroy_target (w, target):
         w.shoot ()
     return target.destroyed
 
-def drive_circle (t, time, length):
+def drive_circle (t, game, length):
 
-    start = abs (time)
-    while start + length > time:
-        t.rotation = (time - start) / length * math.pi * 2
+    start = game.time
+    while start + length > game.time:
+        t.rotation = (game.time - start) / length * math.pi * 2
         yield (lambda: True)
 
-def main (tank, time):
+def main (tank, game):
 
     x, y = tank.position
 
@@ -40,7 +40,7 @@ def main (tank, time):
     log = get_logger ("DemoTank")
     log.info ("Imma driving a circle!")
     tank.throttle = .5
-    yield from drive_circle (tank, time, 4)
+    yield from drive_circle (tank, game, 4)
 
     tank.throttle = 0
     tank.rotation = 0

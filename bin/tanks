@@ -11,7 +11,7 @@ from pygame.locals import *
 
 import copanzers
 from copanzers.systems import *
-from copanzers.util import make_color_surface, RefFloat
+from copanzers.util import make_color_surface
 from copanzers import make
 
 def load_routine (script):
@@ -21,7 +21,7 @@ def load_routine (script):
         routine = exec (f.read (), l)
         return l ["main"]
 
-def init_demo (entity_manager, w, h, time, _):
+def init_demo (entity_manager, w, h, game, _):
     # we don't need the args instance in here yet and just add that paramater
     # to make the function signatures equal
 
@@ -29,18 +29,18 @@ def init_demo (entity_manager, w, h, time, _):
     for i in range (3):
         make.example_barrier (entity_manager, 20, (20, 20), (50 + i * (w - 100)/2, 50))
 
-    make.scripted_turret (entity_manager, 
-            load_routine ("examples/demo_turret.py"), 
-            time, (w * .9, h * .9))
-    make.scripted_turret (entity_manager, 
-            load_routine ("examples/demo_turret.py"), 
-            time, (w * .1, h * .9))
+    make.scripted_turret (entity_manager,
+            load_routine ("examples/demo_turret.py"),
+            game, (w * .9, h * .9))
+    make.scripted_turret (entity_manager,
+            load_routine ("examples/demo_turret.py"),
+            game, (w * .1, h * .9))
 
-    make.scripted_tank (entity_manager, 
+    make.scripted_tank (entity_manager,
             load_routine ("examples/demo_tank.py"),
-            time, (w * .5, h * .5))
+            game, (w * .5, h * .5))
 
-def init_match (entity_manager, w, h, time, args):
+def init_match (entity_manager, w, h, game, args):
 
     n = len (args.scripts)
     offset = 100
@@ -49,8 +49,7 @@ def init_match (entity_manager, w, h, time, args):
         make.scripted_tank (
                 entity_manager,
                 load_routine (args.scripts [i]),
-                time,
-                # ahaha inline ifs!
+                game,
                 (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
         )
 
@@ -107,8 +106,14 @@ def main (fps, w, h):
     system_manager.add_system (HealthRenderSystem (surface))
     system_manager.add_system (KillSystem ())
 
-    time = RefFloat (0)
-    args.init (entity_manager, w, h, time, args)
+    # small helper class to give scripts easy access to some misc info
+    class GameInfo:
+        __slots__ = "size", "time"
+
+    game = GameInfo ()
+    game.size = (w, h)
+    game.time = 0
+    args.init (entity_manager, w, h, game, args)
 
     dt = args.speed / fps
 
@@ -120,7 +125,7 @@ def main (fps, w, h):
         system_manager.update (dt)
         pygame.display.update ()
         clock.tick (fps)
-        time += dt
+        game.time += dt
 
 if __name__ == "__main__":
     main (30, 640, 340)

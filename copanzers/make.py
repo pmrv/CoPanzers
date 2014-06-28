@@ -75,8 +75,8 @@ def weapon (eman, texture, reload_time, bullet_properties, root, slot):
     slot        -- int, into which mountpoint of root this weapon should be put into
     """
 
-    # Not catching the NonexistentComponentTypeForEntity exception here 
-    # because we cannot do anything reasonable with it here. 
+    # Not catching the NonexistentComponentTypeForEntity exception here
+    # because we cannot do anything reasonable with it here.
     # If we catch it and fail silently the caller can assume the weapon
     # was successfully created, if we catch it and return some error indication
     # they will have to check for that, in which case it is cleaner for them
@@ -127,7 +127,7 @@ def radar (eman, root, slot, reach):
 
     return e
 
-def scripted_turret (eman, routine, time, pos):
+def scripted_turret (eman, routine, game, pos):
 
     h, w = 30, 30
     s = pygame.Surface ((h, w))
@@ -142,12 +142,12 @@ def scripted_turret (eman, routine, time, pos):
     eman.add_component (e, Vision ("plain", 350))
     example_weapon (eman, e, 0)
     eman.add_component (e, 
-            Script (routine (RWInterface (e, eman), time)))
+            Script (routine (RWInterface (e, eman), game)))
     eman.add_component (e, Tags (Class = "Turret"))
 
     return e
 
-def scripted_tank (eman, routine, time, pos):
+def scripted_tank (eman, routine, game, pos):
 
     e = example_barrier (eman, 100, (60, 20), pos)
     pos = eman.database [Position] [e]
@@ -161,5 +161,5 @@ def scripted_tank (eman, routine, time, pos):
     example_weapon (eman, e, 0)
     radar (eman, e, 1, 1200)
     eman.add_component (e, 
-        Script (routine (RWInterface (e, eman), time))
+        Script (routine (RWInterface (e, eman), game))
     )

@@ -8,4 +8,3 @@ class Script (Component):
         """
         self.routine   = routine
         self.predicate = lambda: True
-        

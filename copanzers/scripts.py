@@ -4,15 +4,14 @@ from functools import partial
 from ecs.managers import EntityManager
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
-from copanzers.util import RefFloat, Vec2d
-from copanzers.components import (Position, 
-                                Destroyed,
-                                Movement,
-                                Weapon,
-                                Health,
-                                Vision,
-                                Mount,
-                                Tags)
+from copanzers.components import (Position,
+                                  Destroyed,
+                                  Movement,
+                                  Weapon,
+                                  Health,
+                                  Vision,
+                                  Mount,
+                                  Tags)
 
 def get_logger (name):
     """
@@ -36,9 +35,18 @@ class RadarInterface:
     limited read only interface to the components of a entity
     """
 
+    _created = {}
+    def __new__ (cls, *args):
+        try:
+            return cls._created [args]
+        except KeyError:
+            ins = super ().__new__ (cls)
+            cls._created [args] = ins
+            return ins
+
     def __init__ (self, entity, entity_manager):
         """
-        entity         -- ecs.models.Entity, the entity this 
+        entity         -- ecs.models.Entity, the entity this
                           interface represents
         entity_manager -- ecs.managers.EntityManager, the manager
                           where we get the entities components from
@@ -47,16 +55,9 @@ class RadarInterface:
         self.e = entity
         self.eman = entity_manager
 
-    def __eq__ (self, other):
-        if hasattr (other, "e"):
-            return self.e == other.e
-        else:
-            # in case we want to compare directly an entity
-            return self.e == other 
-
     @property
     @unsure
-    # not exactly happy with that, maybe unsure should just raise an error 
+    # not exactly happy with that, maybe unsure should just raise an error
     # when someone tries to access values on a destroyed entity
     def destroyed (self):
         return Destroyed in self.eman.database and self.e in self.eman.database [Destroyed]
@@ -76,6 +77,8 @@ class ROInterface (RadarInterface):
     """
     read only interface to the components of a entity
     """
+
+    _created = {}
 
     def __getitem__ (self, i):
         try:
@@ -111,7 +114,7 @@ class ROInterface (RadarInterface):
     @unsure
     def rotation (self):
         """
-        Rotation of the entity, in radians, rotation 0 is parallel to the 
+        Rotation of the entity, in radians, rotation 0 is parallel to the
         x-axis.
         """
         return self.eman.component_for_entity (self.e, Movement).angle
@@ -140,6 +143,8 @@ class RWInterface (ROInterface):
     read/write interface to the components of a entity, intended to be used by
     the script routines
     """
+
+    _created = {}
 
     def __init__ (self, *args, **kw):
         super ().__init__ (*args, **kw)
@@ -175,7 +180,7 @@ class RWInterface (ROInterface):
     @unsure
     def throttle (self):
         """
-        speed of the entity in percent, getter clamps 
+        speed of the entity in percent, getter clamps
         value between 0 and 1
         """
         return self.__throttle
