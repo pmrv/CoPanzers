@@ -170,6 +170,15 @@ class RWInterface (ROInterface):
 
     @property
     @unsure
+    def max_speed (self):
+        """
+        Maximum speed of the entity as a scalar, in px/s.
+        """
+        return self.eman.component_for_entity (self.e,
+                Movement).max_speed
+
+    @property
+    @unsure
     def velocity (self):
         """
         Velocity of the entity as a Vec2d, in px/s.
@@ -199,7 +208,6 @@ class RWInterface (ROInterface):
         List of either interfaces of mounted entities or None if the respective
         mount point is empty.
         """
-        # TODO: not optimal to instanstiate the interface on every call again
         return [RWInterface (m, self.eman) if m else None
             for m in self.eman.component_for_entity (self.e, Mount).mounts]
 

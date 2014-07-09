@@ -11,13 +11,13 @@ from pygame.locals import *
 
 import copanzers
 from copanzers.systems import *
-from copanzers.util import make_color_surface
+from copanzers.util import make_color_surface, Vec2d
 from copanzers import make
 
 def load_routine (script):
 
     with open (script) as f:
-        l = {}
+        l = {"Vec2d": Vec2d}
         routine = exec (f.read (), l)
         return l ["main"]
 
