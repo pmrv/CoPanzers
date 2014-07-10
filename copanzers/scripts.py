@@ -7,6 +7,7 @@ from ecs.exceptions import NonexistentComponentTypeForEntity
 from copanzers.components import (Position,
                                   Destroyed,
                                   Movement,
+                                  Hitbox,
                                   Weapon,
                                   Health,
                                   Vision,
