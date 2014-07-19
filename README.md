@@ -165,6 +165,9 @@ explain a bit more about the second argument the generator function is call with
     attempts to access attributes on its interface will result in
     `AttributeError`.
 
+There is also a slightly more sophisticated example, which you can check out
+with `./bin/tanks match examples{circles.py,defender.py}`.
+
 ## Interfaces
 Interfaces and their attributes give your script a way to interface neatly with
 entities and their components.
@@ -203,6 +206,7 @@ type for a given entity.  From `ROInterface` on interfaces can be indexed
  `.mounts`      | `RWInterface`      | `Mount`          | List of either `RWInterface` of mounted entities or None if the respective mount point is empty. Tricky, huh.
  `.rotation`    | `RWInterface`      | `Movement`       | Same as on `ROInterface` but you can set it now.
  `.speed`       | `RWInterface`      | `Movement`       | Speed of the entity as a scalar, in px/s.
+ `.max_speed`   | `RWInterface`      | `Movement`       | Maximum speed of an entity as a scalar, in px/s
  `.velocity`    | `RWInterface`      | `Movement`       | Velocity of the entity as a vector (same kind as `.position`), in px/s.
  `.throttle`    | `RWInterface`      | `Movement`       | Speed of the entity in percent, setter clamps the value between 0 and 1.
  `.shoot`       | `RWInterface`      | `Weapon`         | Attention, this one's a method no attribute. Calling this will shoot a bullet, if the weapon is reloaded. The bullet will fly in the direction of the `.rotation` attribute of the weapon.
@@ -217,7 +221,7 @@ type for a given entity.  From `ROInterface` on interfaces can be indexed
  `.visualrange` | `RWInterface`      | `Vision`         | How far this entity can see, in px.
 
 
-I don't like half of the attribute name in here, so shoot me ideas if you have
+I don't like half of the attribute names in here, so shoot me ideas if you have
 them.
 
  Component | Tank | Weapon | Radar
