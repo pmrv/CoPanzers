@@ -165,6 +165,9 @@ explain a bit more about the second argument the generator function is call with
     attempts to access attributes on its interface will result in
     `AttributeError`.
 
+There is also a slightly more sophisticated example, which you can check out
+with `./bin/tanks match examples{circles.py,defender.py}`.
+
 ## Interfaces
 Interfaces and their attributes give your script a way to interface neatly with
 entities and their components.
