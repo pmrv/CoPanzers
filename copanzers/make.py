@@ -1,165 +1,128 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
-import pygame
+import pygame, os, logging, collections, json
+from copy import deepcopy
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
+import copanzers.components
 from copanzers.scripts import RWInterface
 from copanzers.components import *
 from copanzers.util import make_color_surface
 
+log = logging.getLogger (__name__)
+
+_presets = {}
+def update_presets (presets):
+    for preset in os.listdir ("presets/entities"):
+        with open ("presets/entities/" + preset) as pref:
+            try:
+                cp_pre = json.load (pref)
+            except ValueError:
+                log.error ("Failed to read in preset '%s', is no valid json.", preset)
+                continue
+
+        try:
+            name = cp_pre ['Misc']['name']
+        except KeyError:
+            log.error ("Failed to read in preset '%s', didn't specify a name.",
+                    preset)
+            continue
+
+        vargs = []
+        compargs = {"vargs": vargs}
+        presets [name] = compargs
+
+        for s in cp_pre:
+            if s == 'Misc': continue
+            try:
+                if "." in s:
+                    # preset has a section of the form Component.factory, so we
+                    # have to get the respective function instead of just the class
+                    c, fac, *_ = s.split (".")
+                    comp = getattr (getattr (copanzers.components, c), fac)
+                else:
+                    comp = getattr (copanzers.components, s)
+            except AttributeError as err:
+                log.error ("Failed to read in preset '%s', specified component \
+or factory '%s' doesn't exist.", preset, err.args [0].split ("'") [-2])
+                del presets [name]
+                break
+
+            compargs [comp] = {}
+
+            for key, val in cp_pre [s].items ():
+                if not isinstance (val, str) or val [0] != '$':
+                    compargs [comp][key] = val
+                    continue
+
+                try:
+                    n = int (val [1:])
+                except ValueError:
+                    log.error ("Failed to read in preset '%s', '%s' is not a \
+valid argument number.", preset, val [1:])
+                    del presets [name]
+                    break
+
+                while n >= len (vargs):
+                    vargs.append ([])
+                vargs [n].append ( (comp, key) )
+            else:
+                continue
+
+            break
+
+def make (eman, game, name, *vargs, pos = (0, 0)):
+    try:
+        proto = _presets [name].copy ()
+    except KeyError:
+        raise ValueError ("Preset {} doesn't exist.".format (name)) from None
+
+    for i, va in enumerate (proto ["vargs"]):
+        try:
+            for c, o in va:
+                proto [c][o] = vargs [i]
+        except IndexError:
+            log.error ("Preset '%s' specified more arguments than were \
+provided.", name)
+            return
+    del proto ["vargs"]
+
+    e = eman.create_entity ()
+    eman.add_component (e, Position (*pos))
+
+    for c, args in proto.items ():
+        # we special case some components here becaues it would be to
+        # cumbersome otherwise, we also have to check whether we might have not
+        # gotten the class itself but an alternative constructor
+        if   c in (Script, getattr (Script, c.__name__, None)):
+            args ["script_args"] = RWInterface (e, eman), game
+        elif c == Mountable:
+            args ["root"] = vargs [0]
+        elif c == Mount:
+            m = Mount (args ['points'])
+            if len (m.mounts) != len (args ['mounts']):
+                log.error ("Preset '%s' provides too much or too few mounted \
+entities for the specified mount points. If some were left empty on purpose, \
+set the respective elements in 'mounts' to null.", name)
+                eman.remove_entity (e)
+                return
+
+            for i, mounted in enumerate (args ['mounts']):
+                if mounted != None:
+                    m.mounts [i] = make (eman, game, mounted, e)
+            eman.add_component (e, m)
+            continue
+
+        eman.add_component (e, c (**args))
+
+    return e
+
 ## defaults for components
-def healthbar (pos, size):
+def healthbar (size):
     """
     return a default health bar component
-    pos, size -- 2 tuple of int, pertaining to the entity the health bar
-                 is created for and _not_ the dimension of the resulting health bar
+    size -- 2 tuple of int, pertaining to the entity the health bar
+            is created for and _not_ the dimension of the resulting health bar
     """
     return HealthBar ( (0, -0.8 * size [1]), (0.7 * size [0], 6) )
 
-
-## defaults for entities
-def bullet (eman, properties, pos, rot, ignore = tuple ()):
-    """
-    eman       -- ecs.managers.EntityManager, where to add the bullet to
-    properties -- 5 tuple of  
-                    0: int, damage,
-                    1: int, speed,
-                    2: int, hit points,
-                    3: pygame.Surface, texture
-                    4: 2 tuple of int, hitbox
-    pos        -- 2 tuple of int, position of the new bullet
-    rot        -- float, in which direction the bullet should be fired
-    """
-
-    e = eman.create_entity ()
-    eman.add_component (e, Position (*pos))
-    eman.add_component (e, Projectile (properties [0], ignore))
-    eman.add_component (e, Movement (rot, properties [1]))
-    eman.add_component (e, Health (properties [2]))
-    eman.add_component (e, Renderable (properties [3], 2))
-    eman.add_component (e, Hitbox (properties [4]))
-    eman.add_component (e, Tags (Class = "Bullet"))
-
-    return e
-
-def barrier (eman, hp, texture, size, pos):
-    """
-    eman    -- ecs.managers.EntityManager, where to add the bullet to
-    hp      -- int, maximum hitpoints of the barrier
-    texture -- pygame.Surface
-    size    -- 2 tuple of int, how big the barrier should be
-    pos     -- 2 tuple of int, position of the new bullet
-    """
-
-    e = eman.create_entity ()
-    eman.add_component (e, Position (*pos))
-    eman.add_component (e, Hitbox (size))
-    eman.add_component (e, Health (hp))
-    eman.add_component (e, healthbar (pos, size))
-    eman.add_component (e, Renderable (texture))
-    eman.add_component (e, Tags (Class = "Barrier"))
-
-    return e
-
-def example_barrier (eman, hp, size, pos):
-    return barrier (eman, hp, make_color_surface (size, (0, 155, 0)), size, pos)
-
-def weapon (eman, texture, reload_time, bullet_properties, root, slot):
-    """
-    Create an entity with Weapon/Position/Renderable/Mountable component.
-
-    eman        -- ecs.managers.EntityManager, where to add the bullet to
-    texture     -- pygame.Surface, what the weapon looks like
-    reload_time -- int, in seconds
-    root        -- ecs.models.Entity, on which other entity this weapon is
-                   mounted on, usually a turret or tanks or whatever
-    slot        -- int, into which mountpoint of root this weapon should be put into
-    """
-
-    # Not catching the NonexistentComponentTypeForEntity exception here
-    # because we cannot do anything reasonable with it here.
-    # If we catch it and fail silently the caller can assume the weapon
-    # was successfully created, if we catch it and return some error indication
-    # they will have to check for that, in which case it is cleaner for them
-    # to just catch the exception themselves.
-    m = eman.component_for_entity (root, Mount)
-    if slot >= m.amount or m.mounts [slot] != None:
-        raise ValueError ("Mount point {} already taken or not existent.".format (slot))
-
-    e = eman.create_entity ()
-    m.mounts [slot] = e
-
-    eman.add_component (e, Position (0, 0)) # Position is later set by the MountSystem
-    eman.add_component (e, Movement (0, 0, 0))
-    eman.add_component (e, Renderable (texture, 1))
-    eman.add_component (e, Mountable (root))
-    eman.add_component (e, Weapon (reload_time, bullet_properties))
-    eman.add_component (e, Tags (Class = "Weapon"))
-
-    return e
-
-def example_weapon (eman, root, slot):
-    """
-    Creates a default turret with some placeholder values for the bullet and
-    a blue triangle as texture.
-    """
-
-    h, w = 20, 20
-    s = pygame.Surface ((h, w))
-    s.set_colorkey ((255, 255, 255))
-    s.fill ((255, 255, 255))
-    pygame.draw.polygon (s, (150, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)))
-    pygame.draw.polygon (s, (  0, 0, 0), ((w/2, 0), (w, h/2), (w/2, h)), 1)
-
-    return weapon (eman, s, .8, (5, 80, 2, make_color_surface ( (5, 5), (255, 255, 0) ), (5, 5)), root, slot)
-
-def radar (eman, root, slot, reach):
-
-    m = eman.component_for_entity (root, Mount)
-    if slot >= m.amount or m.mounts [slot] != None:
-        raise ValueError ("Mount point {} already taken or not existent.".format (slot))
-
-    e = eman.create_entity ()
-    m.mounts [slot] = e
-
-    eman.add_component (e, Position (0, 0))
-    eman.add_component (e, Vision ("radar", reach))
-    eman.add_component (e, Tags (Class = "Radar"))
-
-    return e
-
-def scripted_turret (eman, routine, game, pos):
-
-    h, w = 30, 30
-    s = pygame.Surface ((h, w))
-    s.set_colorkey ((255, 255, 255))
-    s.fill ((255, 255, 255))
-    pygame.draw.polygon (s, (0, 155, 0), ((0, h/2), (w/2, 0), (w, h/2), (w/2, h)))
-    pygame.draw.polygon (s, (0, 0, 0), ((0, h/2), (w/2, 0), (w, h/2), (w/2, h)), 1)
-
-    e = barrier (eman, 80, s, (h, w), pos)
-
-    eman.add_component (e, Mount (((0,0),)))
-    eman.add_component (e, Vision ("plain", 350))
-    example_weapon (eman, e, 0)
-    eman.add_component (e, 
-            Script (routine (RWInterface (e, eman), game)))
-    eman.add_component (e, Tags (Class = "Turret"))
-
-    return e
-
-def scripted_tank (eman, routine, game, pos):
-
-    e = example_barrier (eman, 100, (60, 20), pos)
-    pos = eman.database [Position] [e]
-    mov = Movement (0, 0, 70)
-    tag = eman.database [Tags] [e]
-    tag ["Class"] = "Tank"
-
-    eman.add_component (e, mov)
-    eman.add_component (e, Mount ( ((0, 0),(0, 0)) ))
-    eman.add_component (e, Vision ("plain", 600))
-    example_weapon (eman, e, 0)
-    radar (eman, e, 1, 1200)
-    eman.add_component (e, 
-        Script (routine (RWInterface (e, eman), game))
-    )
+update_presets (_presets)

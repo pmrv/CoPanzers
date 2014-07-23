@@ -6,12 +6,12 @@ from copanzers.util import Vec2d
 
 class Movement (Component, Vec2d):
     ### TODO: expand this class to support accelerations for rotating/moving
-    def __init__ (self, rotation, speed, max_speed = 0):
+    def __init__ (self, rotation = 0, speed = 0, max_speed = -1):
         """
         the rotation parameter is also used for entities that can rotate but
         not move (like weapons)
         rotation  -- float, direction in which the entity is pointing
-        speed     -- float, how fast the entity currently is in px/s 
+        speed     -- float, how fast the entity currently is in px/s
         max_speed -- float, maximum speed
         """
 
@@ -25,9 +25,12 @@ class Movement (Component, Vec2d):
         if l == 0:
             self.x = val
         else:
-            self *= max (0, min (val, self.max_speed)) / l
-    
+            if self.max_speed >= 0:
+                self *= max (0, min (val, self.max_speed)) / l
+            else:
+                self *= max (0, val) / l
+
     def __str__ (self):
         return "Movement ({0.x:f}, {0.y:f})".format (self)
-    
+
     __repr__ = __str__

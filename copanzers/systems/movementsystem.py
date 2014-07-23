@@ -21,7 +21,7 @@ class MovementSystem (LogSystem):
                 pos = self.entity_manager.component_for_entity (e, Position)
             except NonexistentComponentTypeForEntity:
                 self.log.warn ("%s has a Movement but no Position component, \
-                        cannot move it.", e)
+cannot move it.", e)
                 continue 
 
             pos.x += vel.x * dt

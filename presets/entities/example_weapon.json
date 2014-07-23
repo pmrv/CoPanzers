@@ -1,0 +1,21 @@
+{
+  "Misc": {
+    "name": "ExampleWeapon"
+  },
+  "Tags": {
+    "Class": "Weapon"
+  },
+  "Mountable": {
+  },
+  "Movement": {
+    "max_speed": 0
+  },
+  "Renderable.file": {
+    "path": "presets/gfx/weapon.png",
+    "layer": 1
+  },
+  "Weapon": {
+    "reload_time": 0.5,
+    "bullet_type": "ExampleBullet"
+  }
+}

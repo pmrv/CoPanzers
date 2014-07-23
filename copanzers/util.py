@@ -13,14 +13,17 @@ def Rect (center, size):
     return pygame.Rect (center [0] - size [0] / 2, center [1] - size [1] / 2, *size)
 
 class Vec2d:
-    """ Simple two-dimensional vector """
+    """
+    Simple two-dimensional vector, that saves rotation even when its
+    magitude is zero.
+    """
 
     __slots__ = "x", "y", "_Vec2d__nullangle"
 
     def __init__ (self, x, y):
         self.x = x
         self.y = y
-        self.__nullangle = self.angle if x != y else 0
+        self.__nullangle = self.angle if x + y != 0 else 0
         """ allow the null vector to be rotated, mostly for convenience in the
         Movement component """
 

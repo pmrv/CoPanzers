@@ -25,8 +25,7 @@ class WeaponSystem (LogSystem):
                 rot = eman.component_for_entity (e, Movement).angle
                 pos = eman.component_for_entity (e, Position)
                 ign = (eman.component_for_entity (e, Mountable).root,)
+                make.make (eman, None, weapon.bullet_type, rot, ign, pos = pos)
 
                 self.log.debug ("Weapon %s fired bullet from %s with angle %i°.",
                         e, pos, math.degrees (-rot))
-                make.bullet (eman, weapon.bullet_properties, pos, rot, ign)
-            

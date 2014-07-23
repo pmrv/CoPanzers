@@ -25,20 +25,17 @@ def init_demo (entity_manager, w, h, game, _):
     # we don't need the args instance in here yet and just add that paramater
     # to make the function signatures equal
 
-    make.example_barrier (entity_manager, 100, (w / 4, 20), (w / 2, 100))
+    make.make (entity_manager, game, "ExampleBarrier", 100, (w/ 4, 20), pos = (w / 2, 100))
     for i in range (3):
-        make.example_barrier (entity_manager, 20, (20, 20), (50 + i * (w - 100)/2, 50))
+        make.make (entity_manager, game, "ExampleBarrier", 20, (20, 20),
+                   pos = (50 + i * (w - 100) / 2, 60))
 
-    make.scripted_turret (entity_manager,
-            load_routine ("examples/demo_turret.py"),
-            game, (w * .9, h * .9))
-    make.scripted_turret (entity_manager,
-            load_routine ("examples/demo_turret.py"),
-            game, (w * .1, h * .9))
-
-    make.scripted_tank (entity_manager,
-            load_routine ("examples/demo_tank.py"),
-            game, (w * .5, h * .5))
+    make.make (entity_manager, game, "ScriptedTurret", "One", "presets/ai/demo_turret.py",
+               pos = (w * .9, h * .9))
+    make.make (entity_manager, game, "ScriptedTurret", "One", "presets/ai/demo_turret.py",
+               pos = (w * .1, h * .9))
+    make.make (entity_manager, game, "ScriptedTank", "Two", "presets/ai/demo_tank.py",
+               pos = (w * .5, h * .5))
 
 def init_match (entity_manager, w, h, game, args):
 
@@ -46,11 +43,13 @@ def init_match (entity_manager, w, h, game, args):
     offset = 100
 
     for i in range (n):
-        make.scripted_tank (
+        make.make (
                 entity_manager,
-                load_routine (args.scripts [i]),
                 game,
-                (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
+                "ScriptedTank",
+                str (i),
+                args.scripts [i],
+                pos = (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
         )
 
 def main (fps, w, h):
@@ -107,6 +106,7 @@ def main (fps, w, h):
     system_manager.add_system (KillSystem ())
 
     # small helper class to give scripts easy access to some misc info
+    # we could use a dictionary, but game.time is shorter than game ["time"]
     class GameInfo:
         __slots__ = "size", "time"
 

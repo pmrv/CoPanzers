@@ -1,0 +1,18 @@
+{
+  "Misc": {
+    "name": "ExampleBarrier"
+  },
+  "Tags": {
+    "Class": "Barrier"
+  },
+  "Health": {
+    "max_hp": "$0"
+  },
+  "Renderable.color": {
+    "color": [0, 155, 0],
+    "size": "$1"
+  },
+  "Hitbox": {
+    "size": "$1"
+  }
+}

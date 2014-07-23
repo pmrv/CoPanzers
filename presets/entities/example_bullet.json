@@ -1,0 +1,27 @@
+{
+  "Misc": {
+    "name": "ExampleBullet"
+  },
+  "Tags": {
+    "Class": "Bullet"
+  },
+  "Movement": {
+    "rotation": "$0",
+    "speed": 80,
+    "max_speed": 80
+  },
+  "Health": {
+    "max_hp": 2
+  },
+  "Projectile": {
+    "damage": 5,
+    "ignore": "$1"
+  },
+  "Renderable.file": {
+    "path": "presets/gfx/bullet.png",
+    "layer": 2
+  },
+  "Hitbox": {
+    "size": [5, 5]
+  }
+}
