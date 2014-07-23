@@ -138,7 +138,7 @@ explain a bit more about the second argument the generator function is call with
 
 * Line [12](examples/demo_turret.py#L12):
 
-    So this is where weapons come in. Your tank has a attribute `.mount` which
+    So this is where weapons come in. Your tank has a attribute `.mounts` which
     is a list of all stuff mounted on top of it (only one weapon so far, but
     that may change in the future). The weapon has a very similar interface to
     the one of your tank, but obviously some attributes will be different or
