@@ -56,6 +56,15 @@ class RadarInterface:
         self.e = entity
         self.eman = entity_manager
 
+    def __eq__ (self, other):
+        if not isinstance (other, RadarInterface):
+            return False
+        else:
+            return self.e == other.e
+
+    def __hash__ (self):
+        return int (self.e._guid)
+
     @property
     @unsure
     # not exactly happy with that, maybe unsure should just raise an error

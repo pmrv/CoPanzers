@@ -1,0 +1,14 @@
+{
+  "Misc": {
+    "name": "ExampleRadar"
+  },
+  "Tags": {
+    "Class": "Radar"
+  },
+  "Mountable": {
+  },
+  "Vision": {
+    "kind": "radar",
+    "reach": 600
+  }
+}

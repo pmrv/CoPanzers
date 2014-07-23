@@ -1,0 +1,35 @@
+{
+  "Misc": {
+    "name": "ScriptedTank"
+  },
+  "Tags": {
+    "Class": "Tank",
+    "team": "$0"
+  },
+  "Renderable.color": {
+    "color": [155, 0, 0],
+    "size": [40, 30]
+  },
+  "Health": {
+    "max_hp": 80
+  },
+  "Hitbox": {
+    "size": [30, 30]
+  },
+  "Movement": {
+    "max_speed": 70
+  },
+  "Vision": {
+    "kind": "plain",
+    "reach": 600
+  },
+  "Mount": {
+    "points": [[0,0], [0,0]],
+    "mounts": [
+      "ExampleWeapon",
+      "ExampleRadar"
+  ]},
+  "Script.file": {
+    "path": "$1"
+  }
+}

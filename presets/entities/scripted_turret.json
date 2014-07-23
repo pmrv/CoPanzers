@@ -1,0 +1,30 @@
+{
+  "Misc": {
+    "name": "ScriptedTurret"
+  },
+  "Tags": {
+    "Class": "Turret",
+    "team":  "$0"
+  },
+  "Renderable.file": {
+    "path": "presets/gfx/turret.png"
+  },
+  "Health": {
+    "max_hp": 80
+  },
+  "Hitbox": {
+    "size": [30, 30]
+  },
+  "Vision": {
+    "kind": "plain",
+    "reach": 350
+  },
+  "Mount": {
+    "points": [[0,0]],
+    "mounts": [
+      "ExampleWeapon"
+  ]},
+  "Script.file": {
+    "path": "$1"
+  }
+}
