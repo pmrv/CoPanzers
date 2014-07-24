@@ -3,8 +3,7 @@
     "name": "ScriptedTank"
   },
   "Tags": {
-    "Class": "Tank",
-    "team": "$0"
+    "Class": "Tank"
   },
   "Renderable.color": {
     "color": [155, 0, 0],
@@ -13,6 +12,7 @@
   "Health": {
     "max_hp": 80
   },
+  "HealthBar": {},
   "Hitbox": {
     "size": [30, 30]
   },
@@ -30,6 +30,6 @@
       "ExampleRadar"
   ]},
   "Script.file": {
-    "path": "$1"
+    "path": "$0"
   }
 }

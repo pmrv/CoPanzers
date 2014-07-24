@@ -8,6 +8,7 @@
   "Health": {
     "max_hp": "$0"
   },
+  "HealthBar": {},
   "Renderable.color": {
     "color": [0, 155, 0],
     "size": "$1"

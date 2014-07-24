@@ -11,43 +11,31 @@ from pygame.locals import *
 
 import copanzers
 from copanzers.systems import *
-from copanzers.util import make_color_surface, Vec2d
-from copanzers import make
+from copanzers.make import Maker
 
-def load_routine (script):
-
-    with open (script) as f:
-        l = {"Vec2d": Vec2d}
-        routine = exec (f.read (), l)
-        return l ["main"]
-
-def init_demo (entity_manager, w, h, game, _):
+def init_demo (maker, w, h, _):
     # we don't need the args instance in here yet and just add that paramater
     # to make the function signatures equal
 
-    make.make (entity_manager, game, "ExampleBarrier", 100, (w/ 4, 20), pos = (w / 2, 100))
+    maker ["ExampleBarrier"] (100, (w/ 4, 20), pos = (w / 2, 100))
     for i in range (3):
-        make.make (entity_manager, game, "ExampleBarrier", 20, (20, 20),
+        maker ["ExampleBarrier"] (20, (20, 20),
                    pos = (50 + i * (w - 100) / 2, 60))
 
-    make.make (entity_manager, game, "ScriptedTurret", "One", "presets/ai/demo_turret.py",
+    maker ["ScriptedTurret"] ("presets/ai/demo_turret.py",
                pos = (w * .9, h * .9))
-    make.make (entity_manager, game, "ScriptedTurret", "One", "presets/ai/demo_turret.py",
+    maker ["ScriptedTurret"] ("presets/ai/demo_turret.py",
                pos = (w * .1, h * .9))
-    make.make (entity_manager, game, "ScriptedTank", "Two", "presets/ai/demo_tank.py",
+    maker ["ScriptedTank"] ("presets/ai/demo_tank.py",
                pos = (w * .5, h * .5))
 
-def init_match (entity_manager, w, h, game, args):
+def init_match (maker, w, h, args):
 
     n = len (args.scripts)
     offset = 100
 
     for i in range (n):
-        make.make (
-                entity_manager,
-                game,
-                "ScriptedTank",
-                str (i),
+        maker ["ScriptedTank"] (
                 args.scripts [i],
                 pos = (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
         )
@@ -94,9 +82,21 @@ def main (fps, w, h):
     entity_manager = ecs.managers.EntityManager ()
     system_manager = ecs.managers.SystemManager (entity_manager)
 
+    # small helper class to give scripts easy access to some misc info
+    # we could use a dictionary, but game.time is shorter than game ["time"]
+    # and we only need one instance anyway
+    class GameInfo:
+        __slots__ = "size", "time"
+
+    game = GameInfo ()
+    game.size = (w, h)
+    game.time = 0
+
+    maker = Maker (entity_manager, game, "presets/entities")
+
     system_manager.add_system (MovementSystem (w, h))
     system_manager.add_system (HealthSystem ())
-    system_manager.add_system (WeaponSystem ())
+    system_manager.add_system (WeaponSystem (maker))
     system_manager.add_system (MountSystem ())
     system_manager.add_system (CollisionSystem ())
     system_manager.add_system (VisionSystem ())
@@ -104,16 +104,7 @@ def main (fps, w, h):
     system_manager.add_system (RenderSystem (surface))
     system_manager.add_system (HealthRenderSystem (surface))
     system_manager.add_system (KillSystem ())
-
-    # small helper class to give scripts easy access to some misc info
-    # we could use a dictionary, but game.time is shorter than game ["time"]
-    class GameInfo:
-        __slots__ = "size", "time"
-
-    game = GameInfo ()
-    game.size = (w, h)
-    game.time = 0
-    args.init (entity_manager, w, h, game, args)
+    args.init (maker, w, h, args)
 
     dt = args.speed / fps
 

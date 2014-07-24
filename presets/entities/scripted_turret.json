@@ -3,8 +3,7 @@
     "name": "ScriptedTurret"
   },
   "Tags": {
-    "Class": "Turret",
-    "team":  "$0"
+    "Class": "Turret"
   },
   "Renderable.file": {
     "path": "presets/gfx/turret.png"
@@ -12,6 +11,7 @@
   "Health": {
     "max_hp": 80
   },
+  "HealthBar": {},
   "Hitbox": {
     "size": [30, 30]
   },
@@ -25,6 +25,6 @@
       "ExampleWeapon"
   ]},
   "Script.file": {
-    "path": "$1"
+    "path": "$0"
   }
 }
