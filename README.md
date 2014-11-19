@@ -18,7 +18,7 @@ been a bit laz… abstract when designing the textures.
 
 So the twist is that this behaviour is not hardcoded into the demo but
 controlled by (more or less) simple python coroutines. They are found in
-[examples/](examples/), feel free to play around with them once I
+[presets/ai/](presets/ai/), feel free to play around with them once I
 have explained how they work.
 
 You can also have a number routines battle each other with `./bin/tanks match
@@ -58,16 +58,16 @@ The general process followed by the game is this:
 4. goto 2.
 
 So with that in mind let's look over
-[examples/demo_tank.py](examples/demo_tank.py#L19) to get some of the details
+[presets/ai/demo_tank.py](presets/ai/demo_tank.py#L19) to get some of the details
 straight.
 
-* Line [19-21](examples/demo_tank.py#L19):
+* Line [19-21](presets/ai/demo_tank.py#L19):
 
     As I said previously the first argument is an interface to your tank. This
     is a reference so the exact value of e.g. `tank.position` *will* change
     over time, but *only* when your generator is currently not executing.
 
-* Line [23-25](examples/demo_tank.py#L23)
+* Line [23-25](presets/ai/demo_tank.py#L23)
 
     It's getting a little bit more interesting now. We're setting the tank to
     full speed and rotate by -90°, i.e. to the top. After that we yield a
@@ -80,32 +80,32 @@ straight.
     continue to run and 'wake' us when the condition encoded in the function is
     true.
 
-* Line [27-38](examples/demo_tank.py#L27):
+* Line [27-38](presets/ai/demo_tank.py#L27):
 
     Now those are some minor variations of the former theme, just to drive the
     point home.
 
-* Line [40](examples/demo_tank.py#L40):
+* Line [40](presets/ai/demo_tank.py#L40):
 
     Just something to ease debugging of your scripts, check
     [this](copanzers/scripts.py#L17) if you're familiar with python `logging`
     module.
 
-* Line [43](examples/demo_tank.py#L43):
+* Line [43](presets/ai/demo_tank.py#L43):
 
     This is just to show you that you can still encapsulate behaviour like you can
     with functions, just that you use sub generators and the `yield from` syntax
     now. `game.time` as mentioned earlier is just a float telling you how much
     time has passed.
 
-* Line [49](examples/demo_tank.py#L49):
+* Line [49](presets/ai/demo_tank.py#L49):
 
     So there is stuff mounted on you tank. Some more on that in the next
     example and next section. For now it's first its weapon and
     then its radar. You can always check it with `[print (m ["Class"]) for m in
     tank.mounts]`, though. Check next section with details on both.
 
-* Line [52](examples/demo_tank.py#L52):
+* Line [52](presets/ai/demo_tank.py#L52):
 
     This will iterate over all entities visible on your radar, but there's a
     catch. The loop will only go over entities that were visible at the time
@@ -113,17 +113,17 @@ straight.
     be everything there is to see. I don't have an easy fix for this though, so
     meh™.
 
-* Line [53-54](examples/demo_tank.py#L53):
+* Line [53-54](presets/ai/demo_tank.py#L53):
 
     Positions are vectors, so you can add and subtract them and some more, check the next
     section for some details.
 
-* Line [54](examples/demo_tank.py#L54):
+* Line [54](presets/ai/demo_tank.py#L54):
 
     Interfaces of all types are comparable to each other will compare equal if
     they refer to the same entity, we use this here to not target ourselves.
 
-* Line [56](examples/demo_tank.py#L56)
+* Line [56](presets/ai/demo_tank.py#L56)
 
     It's getting a bit complicated here to show that the function we return
     don't have to be without side effects, but are actually a pretty good place
@@ -133,10 +133,10 @@ straight.
     just don't like it as much.
 
 You will notice that the tank also has a weapon and we will see in
-[examples/demo_turret.py](examples/demo_turret.py#L10) how to use it. I will also
+[presets/ai/demo_turret.py](presets/ai/demo_turret.py#L10) how to use it. I will also
 explain a bit more about the second argument the generator function is call with.
 
-* Line [12](examples/demo_turret.py#L12):
+* Line [12](presets/ai/demo_turret.py#L12):
 
     So this is where weapons come in. Your tank has a attribute `.mounts` which
     is a list of all stuff mounted on top of it (only one weapon so far, but
@@ -144,7 +144,7 @@ explain a bit more about the second argument the generator function is call with
     the one of your tank, but obviously some attributes will be different or
     not existent, check the next section for details.
 
-* Line [14](examples/demo_turret.py#L14):
+* Line [14](presets/ai/demo_turret.py#L14):
 
     This is line has two important points:
     1. the attribute `turret.visible` is an iterator over all living entities
@@ -158,7 +158,7 @@ explain a bit more about the second argument the generator function is call with
        certain key it will raise a `KeyError` just like an ordinary dictionary,
        there will be docs on the keys employed by the game later™
 
-* Line [5](examples/demo_turret.py#L5):
+* Line [5](presets/ai/demo_turret.py#L5):
 
     Every interface we talked about so far also has a attribute `.destroyed`
     which is exactly what it says on the tin. If an entity is destroyed all
@@ -166,7 +166,7 @@ explain a bit more about the second argument the generator function is call with
     `AttributeError`.
 
 There is also a slightly more sophisticated example, which you can check out
-with `./bin/tanks match examples{circles.py,defender.py}`.
+with `./bin/tanks match presets/ai{circles.py,defender.py}`.
 
 ## Interfaces
 Interfaces and their attributes give your script a way to interface neatly with
