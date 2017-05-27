@@ -49,15 +49,17 @@ class Maker:
                 if s == 'Misc': continue
                 try:
                     if "." in s:
-                        # preset has a section of the form Component.factory, so we
-                        # have to get the respective function instead of just the class
+                        # preset has a section of the form Component.factory,
+                        # so we have to get the respective function instead of
+                        # just the class
                         c, fac, *_ = s.split (".")
                         comp = getattr (getattr (copanzers.components, c), fac)
                     else:
                         comp = getattr (copanzers.components, s)
                 except AttributeError as err:
-                    log.error ("Failed to read in preset '%s', specified component \
-or factory '%s' doesn't exist.", preset, err.args [0].split ("'") [-2])
+                    log.error ("Failed to read in preset '%s', specified "
+                               "component or factory '%s' doesn't exist.",
+                               preset, err.args [0].split ("'") [-2])
                     del self.presets [name]
                     break
 
@@ -71,8 +73,9 @@ or factory '%s' doesn't exist.", preset, err.args [0].split ("'") [-2])
                     try:
                         n = int (val [1:])
                     except ValueError:
-                        log.error ("Failed to read in preset '%s', '%s' is not a \
-valid argument number.", preset, val [1:])
+                        log.error ("Failed to read in preset '%s', '%s' is "
+                                   "not a valid argument number.",
+                                   preset, val [1:])
                         del self.presets [name]
                         break
 
@@ -95,8 +98,8 @@ valid argument number.", preset, val [1:])
                 for c, o in va:
                     proto [c][o] = vargs [i]
             except IndexError:
-                log.error ("Preset '%s' specified more arguments than were \
-provided.", name)
+                log.error ("Preset '%s' specified more arguments than were "
+                           "provided.", name)
                 return
         del proto ["vargs"]
 
@@ -106,8 +109,8 @@ provided.", name)
 
         for c, args in proto.items ():
             # we special case some components here becaues it would be to
-            # cumbersome otherwise, we also have to check whether we might have not
-            # gotten the class itself but an alternative constructor
+            # cumbersome otherwise, we also have to check whether we might have
+            # not gotten the class itself but an alternative constructor
             if   c in (Script, getattr (Script, c.__name__, None)):
                 args ["script_args"] = RWInterface (e, self.eman), self.game
             elif c == Mountable:
@@ -121,9 +124,11 @@ provided.", name)
             elif c == Mount:
                 m = Mount (args ['points'])
                 if len (m.mounts) != len (args ['mounts']):
-                    log.error ("Preset '%s' provides too much or too few mounted \
-entities for the specified mount points. If some were left empty on purpose, set \
-the respective elements in 'mounts' to null.", name)
+                    log.error ("Preset '%s' provides too much or too few "
+                               "mounted \ entities for the specified mount "
+                               "points. If some were left empty on purpose, "
+                               "set the respective elements in 'mounts' to "
+                               "null.", name)
                     self.eman.remove_entity (e)
                     return
 
