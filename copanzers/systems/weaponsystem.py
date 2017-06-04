@@ -32,4 +32,4 @@ class WeaponSystem (LogSystem):
                 self.maker [weapon.bullet_type] (rot, ign, pos = pos)
 
                 self.log.debug ("Weapon %s fired bullet from %s with angle %i°.",
-                        e, pos, math.degrees (-rot))
+                                e, pos, math.degrees (-rot))

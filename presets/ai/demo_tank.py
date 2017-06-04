@@ -1,6 +1,5 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import math
-from functools import partial
 
 from copanzers.scripts import get_logger
 
@@ -54,5 +53,5 @@ def main (tank, game):
         if abs (d) <= 200 and o != tank and o not in tank.mounts:
             log.info ("Aiming at %s", o.e)
             cannon.rotation = d.angle
-            yield partial (destroy_target, cannon, o)
+            yield (lambda: destroy_target(cannon, o))
 

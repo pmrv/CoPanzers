@@ -1,5 +1,5 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
-import pygame
+from copanzers.util import Rect
 from ecs.exceptions import NonexistentComponentTypeForEntity
 
 from copanzers.systems import LogSystem
@@ -11,7 +11,7 @@ class MovementSystem (LogSystem):
         """
         width, height -- int, specify size of the visible screen
         """
-        self.screen = pygame.Rect ( (0, 0, width, height) )
+        self.screen = Rect (0, 0, width, height)
         super ().__init__ ()
 
     def update (self, dt):

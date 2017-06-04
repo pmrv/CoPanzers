@@ -1,16 +1,78 @@
-# Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
-from functools import total_ordering
-import pygame, math
+"""Copyright (C) 2014 Marvin Poul <ponder@creshal.de>"""
 
-def make_color_surface (size, color, colorkey = (255, 255, 255)):
-    surface = pygame.Surface (size)
-    surface.set_colorkey (colorkey)
-    surface.fill (color)
-    pygame.draw.rect (surface, (0, 0, 0), surface.get_rect (), 1)
-    return surface
+import math
+import struct
+import ctypes
+from types import SimpleNamespace
 
-def Rect (center, size):
-    return pygame.Rect (center [0] - size [0] / 2, center [1] - size [1] / 2, *size)
+class SDLState(SimpleNamespace):
+    img = ctypes.cdll.LoadLibrary("libSDL2_image.so")
+    img.IMG_LoadTexture.restype = ctypes.c_void_p
+
+    sdl = ctypes.cdll.LoadLibrary("libSDL2.so")
+    sdl.SDL_GetError.restype = ctypes.c_char_p
+    sdl.SDL_CreateTextureFromSurface.restype = ctypes.c_void_p
+
+    window = ctypes.c_void_p()
+    renderer = ctypes.c_void_p()
+
+gfx = SDLState()
+
+class Rect(ctypes.Structure):
+    """
+    ctypes wrapper for the SDL_Rect structure
+    """
+
+    _fields_ = [("x", ctypes.c_int),
+                ("y", ctypes.c_int),
+                ("w", ctypes.c_int),
+                ("h", ctypes.c_int)]
+
+    @property
+    def center(self):
+        return (self.x + self.w//2,
+                self.y + self.h//2)
+
+    @center.setter
+    def center(self, xy):
+        x, y = xy
+        self.x = int(x - self.w//2)
+        self.y = int(y - self.h//2)
+
+    @property
+    def size(self):
+        return self.w, self.h
+
+    @property
+    def topleft(self):
+        return (self.x, self.y)
+
+    @topleft.setter
+    def topleft(self, xy):
+        self.x, self.y = xy
+
+    def collidepoint(self, xy):
+        x, y = xy
+        return self.x <= x < self.x + self.w \
+           and self.y <= y < self.y + self.h
+
+    def colliderect(self, other):
+        otl = other.topleft
+        otr = otl[0] + other.w, otl[1]
+        obl = otl[0], otl[1] + other.h
+        obr = obl[0] + other.w, obl[1]
+        stl = self.topleft
+        strr = stl[0] + self.w, stl[1]
+        sbl = stl[0], stl[1] + self.h
+        sbr = sbl[0] + self.w, sbl[1]
+        return     self.collidepoint(otl) \
+                or self.collidepoint(otr) \
+                or self.collidepoint(obl) \
+                or self.collidepoint(obr) \
+                or other.collidepoint(stl) \
+                or other.collidepoint(strr) \
+                or other.collidepoint(sbl) \
+                or other.collidepoint(sbr) \
 
 class Vec2d:
     """

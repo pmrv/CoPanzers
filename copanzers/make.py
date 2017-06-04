@@ -1,5 +1,5 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
-import pygame, os, logging, json
+import os, logging, json
 from functools import partial
 from copy import deepcopy
 from ecs.exceptions import NonexistentComponentTypeForEntity

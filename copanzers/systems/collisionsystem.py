@@ -35,10 +35,10 @@ class CollisionSystem (LogSystem):
 
                 ohit.center = opos.x, opos.y
 
-                # TODO: we should use pygame.Rect.collidelistall for this one
                 if ehit.colliderect (ohit):
 
-                    self.log.debug ("Projectile %s hit %s.", e, o)
+                    self.log.debug ("Projectile %s (at %s) hit %s (at %s).",
+                                    e, epos, o, opos)
                     eman.add_component (e, Destroyed ())
 
                     try:

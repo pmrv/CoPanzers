@@ -5,19 +5,21 @@ import argparse
 import sys
 import logging
 import math
-import pygame
+import ctypes
+from types import SimpleNamespace
+
 import ecs
-from pygame.locals import *
 
 import copanzers
 from copanzers.systems import *
 from copanzers.make import Maker
+from copanzers.util import gfx
 
 def init_demo (maker, w, h, _):
     # we don't need the args instance in here yet and just add that paramater
     # to make the function signatures equal
 
-    maker ["ExampleBarrier"] (100, (w/ 4, 20), pos = (w / 2, 100))
+    maker ["ExampleBarrier"] (100, (w / 4, 20), pos = (w / 2, 100))
     for i in range (3):
         maker ["ExampleBarrier"] (20, (20, 20),
                    pos = (50 + i * (w - 100) / 2, 60))
@@ -49,8 +51,9 @@ def main (fps, w, h):
             help = "Can be given multiple times to increase quietness.")
     parser.add_argument ("--script",  "-l", action = "store_true",
             help = "Only print logs from the script routines.")
-    parser.add_argument ("--speed",   "-s", default = 1, type = int,
+    parser.add_argument ("--speed",   "-s", default = 1, type = float,
             help = "Factor how fast the game should play (default: 1).")
+    parser.set_defaults (init = lambda *_: parser.print_help() or sys.exit(1))
 
     subs = parser.add_subparsers ()
     demo_parser = subs.add_parser ("demo")
@@ -75,9 +78,19 @@ def main (fps, w, h):
         root_filter = logging.Filter ("copanzers.scripts")
         root_handler.addFilter (root_filter)
 
-    pygame.init ()
-    surface = pygame.display.set_mode ( (w, h) )
-    clock   = pygame.time.Clock ()
+    SDL_INIT_VIDEO = 0x20
+    if gfx.sdl.SDL_Init(SDL_INIT_VIDEO) != 0:
+        root_logger("Failed to initialize SDL: "
+                  + gfx.sdl.SDL_GetError().decode("utf8"))
+
+    gfx.sdl.SDL_CreateWindowAndRenderer(w, h, 0,
+                                        ctypes.byref(gfx.window),
+                                        ctypes.byref(gfx.renderer))
+    if gfx.window.value == None or gfx.renderer.value == None:
+        root_logger("Failed to create window/renderer: "
+                  + gfx.sdl.SDL_GetError().decode("utf8"))
+
+    # TODO: timing & clock stuff
 
     entity_manager = ecs.managers.EntityManager ()
     system_manager = ecs.managers.SystemManager (entity_manager)
@@ -85,8 +98,8 @@ def main (fps, w, h):
     # small helper class to give scripts easy access to some misc info
     # we could use a dictionary, but game.time is shorter than game ["time"]
     # and we only need one instance anyway
-    class GameInfo:
-        __slots__ = "size", "time"
+    class GameInfo(SimpleNamespace):
+        pass
 
     game = GameInfo ()
     game.size = (w, h)
@@ -101,8 +114,8 @@ def main (fps, w, h):
     system_manager.add_system (CollisionSystem ())
     system_manager.add_system (VisionSystem ())
     system_manager.add_system (ScriptSystem ())
-    system_manager.add_system (RenderSystem (surface))
-    system_manager.add_system (HealthRenderSystem (surface))
+    system_manager.add_system (RenderSystem ())
+    system_manager.add_system (HealthRenderSystem ())
     system_manager.add_system (KillSystem ())
     args.init (maker, w, h, args)
 
@@ -110,12 +123,15 @@ def main (fps, w, h):
 
     while 1:
 
+        """
         for e in pygame.event.get ():
             if e.type == QUIT: return
+            """
 
+        gfx.sdl.SDL_RenderClear(gfx.renderer)
         system_manager.update (dt)
-        pygame.display.update ()
-        clock.tick (fps)
+        gfx.sdl.SDL_RenderPresent(gfx.renderer)
+        gfx.sdl.SDL_Delay(ctypes.c_double(1000/fps))
         game.time += dt
 
 if __name__ == "__main__":
