@@ -15,21 +15,10 @@ from copanzers.systems import *
 from copanzers.make import Maker
 from copanzers.util import gfx
 
-def init_demo (maker, w, h, _):
-    # we don't need the args instance in here yet and just add that paramater
-    # to make the function signatures equal
+def init_demo (maker, w, h, args):
 
-    maker ["ExampleBarrier"] (100, (w / 4, 20), pos = (w / 2, 100))
-    for i in range (3):
-        maker ["ExampleBarrier"] (20, (20, 20),
-                   pos = (50 + i * (w - 100) / 2, 60))
-
-    maker ["ScriptedTurret"] ("presets/ai/demo_turret.py",
-               pos = (w * .9, h * .9))
-    maker ["ScriptedTurret"] ("presets/ai/demo_turret.py",
-               pos = (w * .1, h * .9))
-    maker ["ScriptedTank"] ("presets/ai/demo_tank.py",
-               pos = (w * .5, h * .5))
+    maker.make_level(args.level if args.level is not None
+                                else "presets/levels/demo.json")
 
 def init_match (maker, w, h, args):
 
@@ -58,6 +47,8 @@ def main (fps, w, h):
     subs = parser.add_subparsers ()
     demo_parser = subs.add_parser ("demo")
     demo_parser.set_defaults (init = init_demo)
+    demo_parser.add_argument("-l", "--level", default = None,
+                             help = "Path to the level to load.")
 
     match_parser = subs.add_parser ("match")
     match_parser.add_argument ("scripts", nargs = "+",

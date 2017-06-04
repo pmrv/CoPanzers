@@ -150,3 +150,11 @@ class Maker:
 
     def __getitem__ (self, name):
         return partial (self.make, name)
+
+    def make_level(self, level_file):
+
+        with open(level_file) as lf:
+            level_data = json.load(lf)
+
+        for e in level_data["entities"]:
+            self[e["prototype"]](*e["arguments"], pos = e["position"])

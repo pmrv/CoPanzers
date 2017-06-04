@@ -1,0 +1,48 @@
+{
+    "name": "Demo Level",
+    "size": [640, 340],
+    "entities": [
+        {
+            "name": "Big Barrier",
+            "position":  [320, 100],
+            "prototype": "ExampleBarrier",
+            "arguments": [100, [160, 20]]
+        },
+        {
+            "name": "Small Barrier - Left",
+            "position":  [50, 60],
+            "prototype": "ExampleBarrier",
+            "arguments": [20, [20, 20]]
+        },
+        {
+            "name": "Small Barrier - Center",
+            "position":  [320, 60],
+            "prototype": "ExampleBarrier",
+            "arguments": [20, [20, 20]]
+        },
+        {
+            "name": "Small Barrier - Right",
+            "position":  [590, 60],
+            "prototype": "ExampleBarrier",
+            "arguments": [20, [20, 20]]
+        },
+        {
+            "name": "Turret - Left",
+            "position":  [64, 306],
+            "prototype": "ScriptedTurret",
+            "arguments": ["presets/ai/demo_turret.py"]
+        },
+        {
+            "name": "Turret - Right",
+            "position":  [576, 306],
+            "prototype": "ScriptedTurret",
+            "arguments": ["presets/ai/demo_turret.py"]
+        },
+        {
+            "name": "Panzer",
+            "position":  [320, 170],
+            "prototype": "ScriptedTank",
+            "arguments": ["presets/ai/demo_tank.py"]
+        }
+    ]
+}
