@@ -1,24 +1,24 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 import math
-from ctypes import byref, c_double
+from ctypes import byref
 
 from ecs.exceptions import NonexistentComponentTypeForEntity
+import sdl2 as sdl
 
 from copanzers.systems import LogSystem
 from copanzers.components import *
-from copanzers.util import gfx
 
 class RenderSystem (LogSystem):
 
-    def __init__(self, *args, **kw):
+    def __init__(self, gfx, *args, **kw):
+        self.gfx = gfx
         LogSystem.__init__(self, *args, **kw)
 
     def update (self, _):
 
         # draw white background
-        gfx.sdl.SDL_SetRenderDrawColor(gfx.renderer,
-                                       255, 255, 255)
-        gfx.sdl.SDL_RenderFillRect(gfx.renderer, None)
+        sdl.SDL_SetRenderDrawColor(self.gfx.renderer, 255, 255, 255, 255)
+        sdl.SDL_RenderFillRect(self.gfx.renderer, None)
 
         eman = self.entity_manager
         renders = list (eman.pairs_for_type (Renderable))
@@ -30,10 +30,9 @@ class RenderSystem (LogSystem):
 
             try:
                 rot = eman.component_for_entity(e, Movement).angle
-                gfx.sdl.SDL_RenderCopyEx(gfx.renderer, renderable.texture, None,
-                                         byref(renderable.rect),
-                                         c_double(math.degrees(rot)),
-                                         None, 0x0)
+                sdl.SDL_RenderCopyEx(self.gfx.renderer, renderable.texture, None,
+                                     byref(renderable.rect), math.degrees(rot),
+                                     None, 0x0)
             except NonexistentComponentTypeForEntity:
-                gfx.sdl.SDL_RenderCopy(gfx.renderer, renderable.texture, None,
-                                       byref(renderable.rect))
+                sdl.SDL_RenderCopy(self.gfx.renderer, renderable.texture, None,
+                                   byref(renderable.rect))

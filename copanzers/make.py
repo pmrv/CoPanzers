@@ -12,16 +12,17 @@ log = logging.getLogger (__name__)
 
 class Maker:
 
-    __slots__ = "game", "eman"
     presets = {}
 
-    def __init__ (self, eman, game, entity_path = None):
+    def __init__ (self, eman, game, gfx, entity_path = None):
         """
         entity_path -- str, directory where to find the entity presets
         game -- GameInfo, needed for the script routines, see bin/tanks
+        gfx -- SDLState, the SDL state to create the textures in
         """
         self.eman = eman
         self.game = game
+        self.gfx = gfx
         if entity_path:
             self.update_presets (entity_path)
 
@@ -38,7 +39,7 @@ class Maker:
                 name = cp_pre ['Misc']['name']
             except KeyError:
                 log.error ("Failed to read in preset '%s', didn't specify a name.",
-                        preset)
+                           preset)
                 continue
 
             vargs = []
@@ -56,6 +57,7 @@ class Maker:
                         comp = getattr (getattr (copanzers.components, c), fac)
                     else:
                         comp = getattr (copanzers.components, s)
+
                 except AttributeError as err:
                     log.error ("Failed to read in preset '%s', specified "
                                "component or factory '%s' doesn't exist.",
@@ -111,8 +113,14 @@ class Maker:
             # we special case some components here becaues it would be to
             # cumbersome otherwise, we also have to check whether we might have
             # not gotten the class itself but an alternative constructor
+            # Update: Ugly hacks, instead of relying on the names to match
+            # with the component names, we should probably just make an
+            # explicit mapping between the names exposed and the appropriate
+            # factory function
             if   c in (Script, getattr (Script, c.__name__, None)):
                 args ["script_args"] = RWInterface (e, self.eman), self.game
+            elif c in (Renderable, getattr(Renderable, c.__name__, None)):
+                args ["gfx"] = self.gfx
             elif c == Mountable:
                 args ["root"] = vargs [0]
             elif c == HealthBar:

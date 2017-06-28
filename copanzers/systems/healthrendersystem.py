@@ -1,9 +1,10 @@
 # Copyright (C) 2014 Marvin Poul <ponder@creshal.de>
 from ctypes import byref
 
-from copanzers.util import gfx, Rect
 from ecs.exceptions import NonexistentComponentTypeForEntity
+import sdl2 as sdl
 
+from copanzers.util import Rect
 from copanzers.systems import LogSystem, RenderSystem
 from copanzers.components import *
 
@@ -23,21 +24,21 @@ class HealthRenderSystem (RenderSystem):
                 elif err.component_type == Position:
                     self.log.warn ("%s has no Position component, can't draw its \
                             health bar.", e)
-                continue 
+                continue
 
             border = Rect (int(pos.x + bar.topleft [0]),
                            int(pos.y + bar.topleft [1]),
                            bar.size [0], bar.size [1])
 
-            gfx.sdl.SDL_SetRenderDrawColor(gfx.renderer, 0, 0, 0, 0)
-            gfx.sdl.SDL_RenderDrawRect(gfx.renderer, byref(border))
+            sdl.SDL_SetRenderDrawColor(self.gfx.renderer, 0, 0, 0, 0)
+            sdl.SDL_RenderDrawRect(self.gfx.renderer, byref(border))
 
             remaining = int(health.hp / health.max_hp * (bar.w - 2))
             green_rect = Rect(int(1 + bar.x + pos.x), int(1 + bar.y + pos.y),
                               remaining, bar.h - 2)
 
-            gfx.sdl.SDL_SetRenderDrawColor(gfx.renderer, 0, 255, 0, 0)
-            gfx.sdl.SDL_RenderFillRect(gfx.renderer, byref(green_rect))
+            sdl.SDL_SetRenderDrawColor(self.gfx.renderer, 0, 255, 0, 0)
+            sdl.SDL_RenderFillRect(self.gfx.renderer, byref(green_rect))
 
             if health.hp == health.max_hp:
                 continue
@@ -45,5 +46,5 @@ class HealthRenderSystem (RenderSystem):
             red_rect = Rect(green_rect.x + remaining, green_rect.y,
                             bar.w - remaining - 2, bar.h - 2)
 
-            gfx.sdl.SDL_SetRenderDrawColor(gfx.renderer, 255, 0, 0, 0)
-            gfx.sdl.SDL_RenderFillRect(gfx.renderer, byref(red_rect))
+            sdl.SDL_SetRenderDrawColor(self.gfx.renderer, 255, 0, 0, 0)
+            sdl.SDL_RenderFillRect(self.gfx.renderer, byref(red_rect))

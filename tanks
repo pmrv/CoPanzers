@@ -5,15 +5,16 @@ import argparse
 import sys
 import logging
 import math
-import ctypes
 from types import SimpleNamespace
+import ctypes
 
 import ecs
+import sdl2 as sdl
 
 import copanzers
 from copanzers.systems import *
 from copanzers.make import Maker
-from copanzers.util import gfx
+from copanzers.sdl import SDLState
 
 def init_demo (maker, w, h, args):
 
@@ -31,7 +32,7 @@ def init_match (maker, w, h, args):
                 pos = (offset + i * (w - 2 * offset) / (n - 1 if n > 1 else 1), h * .5)
         )
 
-def main (fps, w, h):
+def main (fps, width, height):
 
     parser = argparse.ArgumentParser (prog = "tanks")
     parser.add_argument ("--verbose", "-v", action = "count", default = 0,
@@ -69,20 +70,6 @@ def main (fps, w, h):
         root_filter = logging.Filter ("copanzers.scripts")
         root_handler.addFilter (root_filter)
 
-    SDL_INIT_VIDEO = 0x20
-    if gfx.sdl.SDL_Init(SDL_INIT_VIDEO) != 0:
-        root_logger("Failed to initialize SDL: "
-                  + gfx.sdl.SDL_GetError().decode("utf8"))
-
-    gfx.sdl.SDL_CreateWindowAndRenderer(w, h, 0,
-                                        ctypes.byref(gfx.window),
-                                        ctypes.byref(gfx.renderer))
-    if gfx.window.value == None or gfx.renderer.value == None:
-        root_logger("Failed to create window/renderer: "
-                  + gfx.sdl.SDL_GetError().decode("utf8"))
-
-    # TODO: timing & clock stuff
-
     entity_manager = ecs.managers.EntityManager ()
     system_manager = ecs.managers.SystemManager (entity_manager)
 
@@ -93,37 +80,36 @@ def main (fps, w, h):
         pass
 
     game = GameInfo ()
-    game.size = (w, h)
+    game.size = (width, height)
     game.time = 0
-
-    maker = Maker (entity_manager, game, "presets/entities")
-
-    system_manager.add_system (MovementSystem (w, h))
-    system_manager.add_system (HealthSystem ())
-    system_manager.add_system (WeaponSystem (maker))
-    system_manager.add_system (MountSystem ())
-    system_manager.add_system (CollisionSystem ())
-    system_manager.add_system (VisionSystem ())
-    system_manager.add_system (ScriptSystem ())
-    system_manager.add_system (RenderSystem ())
-    system_manager.add_system (HealthRenderSystem ())
-    system_manager.add_system (KillSystem ())
-    args.init (maker, w, h, args)
 
     dt = args.speed / fps
 
-    while 1:
+    with SDLState( resolution = (width, height) ) as gfx:
 
-        """
-        for e in pygame.event.get ():
-            if e.type == QUIT: return
-            """
+        maker = Maker (entity_manager, game, gfx, "presets/entities")
 
-        gfx.sdl.SDL_RenderClear(gfx.renderer)
-        system_manager.update (dt)
-        gfx.sdl.SDL_RenderPresent(gfx.renderer)
-        gfx.sdl.SDL_Delay(ctypes.c_double(1000/fps))
-        game.time += dt
+        system_manager.add_system (MovementSystem (width, height))
+        system_manager.add_system (HealthSystem ())
+        system_manager.add_system (WeaponSystem (maker))
+        system_manager.add_system (MountSystem ())
+        system_manager.add_system (CollisionSystem ())
+        system_manager.add_system (VisionSystem ())
+        system_manager.add_system (ScriptSystem ())
+        system_manager.add_system (RenderSystem (gfx = gfx))
+        system_manager.add_system (HealthRenderSystem (gfx = gfx))
+        system_manager.add_system (KillSystem ())
+        args.init (maker, width, height, args)
+
+        while gfx.running:
+
+            sdl.SDL_RenderClear(gfx.renderer)
+            system_manager.update (dt)
+            sdl.SDL_RenderPresent(gfx.renderer)
+            sdl.SDL_Delay(1000//fps)
+            game.time += dt
+
+            gfx.poll()
 
 if __name__ == "__main__":
     main (30, 640, 340)

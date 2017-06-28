@@ -5,28 +5,9 @@ import struct
 import ctypes
 from types import SimpleNamespace
 
-class SDLState(SimpleNamespace):
-    img = ctypes.cdll.LoadLibrary("libSDL2_image.so")
-    img.IMG_LoadTexture.restype = ctypes.c_void_p
+import sdl2 as sdl
 
-    sdl = ctypes.cdll.LoadLibrary("libSDL2.so")
-    sdl.SDL_GetError.restype = ctypes.c_char_p
-    sdl.SDL_CreateTextureFromSurface.restype = ctypes.c_void_p
-
-    window = ctypes.c_void_p()
-    renderer = ctypes.c_void_p()
-
-gfx = SDLState()
-
-class Rect(ctypes.Structure):
-    """
-    ctypes wrapper for the SDL_Rect structure
-    """
-
-    _fields_ = [("x", ctypes.c_int),
-                ("y", ctypes.c_int),
-                ("w", ctypes.c_int),
-                ("h", ctypes.c_int)]
+class Rect(sdl.SDL_Rect):
 
     @property
     def center(self):
