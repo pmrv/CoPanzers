@@ -1,15 +1,15 @@
 
 [ecs]: https://github.com/seanfisk/ecs "ecs"
-[pygame]: http://pygame.org/download.shtml "Pygame"
+[PySDL2]: https://bitbucket.org/marcusva/py-sdl2 "PySDL2"
 
 
 # CoPanzers - Script Dem Panzers
 Attempt at a (programmable) shoot'em up game based on an entity-component-system,
-requires Python3, [pygame][] and [ecs][].
+requires Python3, [PySDL2][] and [ecs][].
 
 ## Running
-Grab [pygame][] from your favorite package manager and [ecs][] from PyPI (`pip
-install ecs`).
+Grab [PySDL2][] and [ecs][] from PyPI (`pip
+install ecs PySDL2`).
 
 Then `./bin/tanks demo` should create a window with a bit of stuff going on.
 There will be two turret shooting at things and a tank driving around doing
