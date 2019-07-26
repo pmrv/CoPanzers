@@ -7,4 +7,4 @@ MANIFEST
 dist/*
 build/*
 todo
-*tag*
+tags
